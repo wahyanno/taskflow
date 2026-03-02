@@ -1,0 +1,527 @@
+/* Project Detail styles */
+// Modal styles reused from project-list
+@import '../project-list/project-list.component.scss';
+
+.detail-page {
+  max-width: 1200px;
+}
+
+/* Members avatars row */
+.members-row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+}
+
+.member-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  cursor: default;
+}
+
+/* Toolbar: filter + view toggle */
+.toolbar-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-md);
+  margin-top: 24px;
+  margin-bottom: 16px;
+}
+
+/* View toggle buttons */
+.view-toggle {
+  display: flex;
+  gap: 4px;
+  background: var(--color-bg-tertiary);
+  border-radius: var(--border-radius);
+  padding: 4px;
+
+  &__btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: var(--border-radius-sm);
+    border: none;
+    background: transparent;
+    color: var(--color-text-muted);
+    font-size: var(--font-size-sm);
+    font-family: var(--font-family);
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+
+    svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    &.active {
+      background: var(--color-primary);
+      color: #fff;
+    }
+
+    &:hover:not(.active) {
+      background: var(--color-bg-secondary);
+      color: var(--color-text);
+    }
+  }
+}
+
+/* Task title in table */
+.task-title {
+  font-weight: 500;
+  font-size: var(--font-size-sm);
+  color: var(--color-text);
+  margin-bottom: 2px;
+}
+
+/* Inline status dropdown */
+.status-select {
+  background: var(--color-bg-tertiary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-sm);
+  padding: 4px 8px;
+  font-size: var(--font-size-xs);
+  font-family: var(--font-family);
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.15s;
+
+  &:focus {
+    border-color: var(--color-primary);
+  }
+
+  &--todo {
+    color: var(--color-text-muted);
+  }
+
+  &--in_progress {
+    color: var(--color-info);
+  }
+
+  &--done {
+    color: var(--color-success);
+  }
+
+  option {
+    background: var(--color-bg-secondary);
+    color: var(--color-text);
+  }
+}
+
+/* ================================================================
+   KANBAN BOARD
+   ================================================================ */
+
+.kanban-board {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-lg);
+  align-items: start;
+  margin-top: 8px;
+}
+
+.kanban-col {
+  background: var(--color-bg-tertiary);
+  border-radius: var(--border-radius);
+  border: 2px solid transparent;
+  transition: border-color 0.2s, background 0.2s;
+  min-height: 300px;
+
+  /* Highlight kolom saat task di-drag over */
+  &.drag-over {
+    border-color: var(--color-primary);
+    background: rgba(99, 102, 241, 0.06);
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border-radius: var(--border-radius) var(--border-radius) 0 0;
+    border-bottom: 2px solid var(--color-border);
+
+    &--todo {
+      border-bottom-color: var(--color-text-muted);
+    }
+
+    &--in_progress {
+      border-bottom-color: var(--color-info);
+    }
+
+    &--done {
+      border-bottom-color: var(--color-success);
+    }
+  }
+
+  &__title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    font-size: var(--font-size-sm);
+  }
+
+  &__dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+
+    &.todo-dot {
+      background: var(--color-text-muted);
+    }
+
+    &.in-progress-dot {
+      background: var(--color-info);
+    }
+
+    &.done-dot {
+      background: var(--color-success);
+    }
+  }
+
+  &__count {
+    background: var(--color-bg-secondary);
+    color: var(--color-text-muted);
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 99px;
+  }
+
+  &__body {
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-height: 200px;
+  }
+
+  &__placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 80px;
+    border: 2px dashed var(--color-border);
+    border-radius: var(--border-radius-sm);
+    color: var(--color-text-muted);
+    font-size: var(--font-size-xs);
+    opacity: 0.6;
+  }
+}
+
+/* ─── Kanban Card ─────────────────────────────────────────────── */
+.kanban-card {
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius);
+  padding: 12px;
+  cursor: grab;
+  transition: box-shadow 0.2s, opacity 0.2s, transform 0.15s;
+
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    cursor: grabbing;
+  }
+
+  /* Card yang sedang di-drag */
+  &.dragging {
+    opacity: 0.4;
+    transform: scale(0.97);
+  }
+
+  /* Done cards — slightly dimmed */
+  &--done {
+    opacity: 0.75;
+
+    .kanban-card__title {
+      text-decoration: line-through;
+      color: var(--color-text-muted);
+    }
+  }
+
+  &__top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+
+  &__delete {
+    background: none;
+    border: none;
+    padding: 2px;
+    cursor: pointer;
+    color: var(--color-text-muted);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    transition: color 0.15s, background 0.15s;
+
+    &:hover {
+      color: #ef4444;
+      background: rgba(239, 68, 68, 0.1);
+    }
+  }
+
+  &__title {
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    color: var(--color-text);
+    margin-bottom: 4px;
+    line-height: 1.4;
+  }
+
+  &__desc {
+    margin-bottom: 8px;
+    line-height: 1.4;
+  }
+
+  &__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+
+  &__assignee {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: var(--font-size-xs);
+    color: var(--color-text-muted);
+  }
+
+  &__due {
+    color: var(--color-text-muted);
+  }
+
+  &__status {
+    width: 100%;
+    font-size: var(--font-size-xs);
+  }
+}
+
+.mini-avatar {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--color-primary), #818cf8);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+/* Two column form layout in modal */
+.modal__two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-md);
+}
+
+.filter-bar {
+  display: flex;
+  gap: var(--spacing-md);
+  align-items: center;
+}
+
+/* Responsive: stack kanban pada layar kecil */
+@media (max-width: 768px) {
+  .kanban-board {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ─── Dynamic color dots ─────────────────────────────────────────────────── */
+/* Semua class [color]-dot dan kanban-col__header--[color] */
+
+// Palet warna; digunakan di kanban header border & dot
+$status-colors: (
+  'gray': #94a3b8,
+  'blue': #3b82f6,
+  'green': #22c55e,
+  'red': #ef4444,
+  'yellow': #eab308,
+  'purple': #a855f7,
+  'orange': #f97316,
+);
+
+@each $name, $color in $status-colors {
+  .#{$name}-dot {
+    background: $color;
+  }
+
+  .kanban-col__header--#{$name} {
+    border-bottom-color: $color;
+  }
+
+  .status-select--#{$name} {
+    color: $color;
+  }
+}
+
+/* Kanban board: auto-columns agar bisa tampung lebih dari 3 status */
+.kanban-board {
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+}
+
+/* ================================================================
+   MANAGE STATUS MODAL - content styles
+   ================================================================ */
+
+/* Modal lebih lebar untuk manage statuses */
+.modal--wide {
+  width: min(700px, 92vw);
+}
+
+/* Daftar status yang sudah ada */
+.status-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.status-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: var(--color-bg-tertiary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-sm);
+  transition: background 0.15s, opacity 0.15s, transform 0.15s, border-color 0.15s, box-shadow 0.15s;
+  cursor: grab;
+  user-select: none;
+
+  &:hover {
+    background: var(--color-bg-secondary);
+  }
+
+  &:active {
+    cursor: grabbing;
+  }
+
+  /* Item yang sedang di-drag — transparan / ghost */
+  &.is-dragging {
+    opacity: 0.35;
+    transform: scale(0.97);
+    border-style: dashed;
+  }
+
+  /* Target drop yang sedang di-hover */
+  &.is-drag-over {
+    border-color: var(--color-primary);
+    background: rgba(99, 102, 241, 0.08);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+  }
+
+  /* Drag handle icon */
+  &__handle {
+    color: var(--color-text-muted);
+    display: flex;
+    align-items: center;
+    cursor: grab;
+    flex-shrink: 0;
+    opacity: 0.45;
+    transition: opacity 0.15s;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+
+  /* Dot warna */
+  &__dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  /* Nama status */
+  &__name {
+    flex: 1;
+    font-weight: 500;
+    font-size: var(--font-size-sm);
+    color: var(--color-text);
+  }
+
+  /* Slug (tidak dapat diubah) */
+  &__slug {
+    font-family: monospace;
+    font-size: var(--font-size-xs);
+    background: var(--color-bg-secondary);
+    padding: 1px 6px;
+    border-radius: 4px;
+    color: var(--color-text-muted);
+  }
+
+  /* Jumlah task di status ini */
+  &__count {
+    color: var(--color-text-muted);
+    min-width: 54px;
+    text-align: right;
+  }
+
+  &__actions {
+    display: flex;
+    gap: 4px;
+  }
+}
+
+/* Hint teks "geser untuk mengubah urutan" */
+.status-list__hint {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 4px;
+  font-style: italic;
+}
+
+/* Form tambah / edit status */
+.status-form {
+  display: flex;
+  gap: var(--spacing-md);
+  align-items: flex-start;
+}
+
+/* Section title di dalam modal */
+.form-section-title {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: 10px;
+}
+
+/* Tombol ghost yang berubah merah saat hover (tombol delete status) */
+.btn--danger-hover {
+  &:hover:not(:disabled) {
+    color: #ef4444;
+    background: rgba(239, 68, 68, 0.1);
+  }
+
+  &:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+}

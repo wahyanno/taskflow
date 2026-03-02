@@ -1,0 +1,131 @@
+<!-- Dashboard Page -->
+<div class="dashboard-page">
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <div>
+      <h2 class="page-header__title">Dashboard</h2>
+      <p class="page-header__subtitle">Overview of your projects and tasks</p>
+    </div>
+    <button class="btn btn--ghost btn--sm" (click)="loadDashboard()" id="btn-refresh-dashboard">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M23 4v6h-6"></path>
+        <path d="M1 20v-6h6"></path>
+        <path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"></path>
+      </svg>
+      Refresh
+    </button>
+  </div>
+
+  <!-- Loading state -->
+  <div *ngIf="isLoading" class="loading-spinner">
+    <div class="spinner"></div>
+    <span>Memuat dashboard...</span>
+  </div>
+
+  <!-- Dashboard Content -->
+  <ng-container *ngIf="!isLoading && dashboardData">
+
+    <!-- ======= STATS GRID ======= -->
+    <div class="stats-grid">
+      <div class="stat-card stat-card--primary">
+        <p class="stat-card__label">Total Projects</p>
+        <p class="stat-card__value">{{ dashboardData.total_projects }}</p>
+        <p class="stat-card__sub">Active projects</p>
+      </div>
+
+      <div class="stat-card stat-card--primary">
+        <p class="stat-card__label">Total Tasks</p>
+        <p class="stat-card__value">{{ dashboardData.total_tasks }}</p>
+        <p class="stat-card__sub">All tasks</p>
+      </div>
+
+      <div class="stat-card stat-card--success">
+        <p class="stat-card__label">Completion Rate</p>
+        <p class="stat-card__value">{{ dashboardData.completion_percent }}%</p>
+        <p class="stat-card__sub">{{ dashboardData.completed_tasks }} tasks done</p>
+      </div>
+
+      <div class="stat-card stat-card--danger">
+        <p class="stat-card__label">Overdue Tasks</p>
+        <p class="stat-card__value">{{ dashboardData.overdue_tasks }}</p>
+        <p class="stat-card__sub">Past due date</p>
+      </div>
+    </div>
+
+    <!-- ======= TASK STATUS BREAKDOWN ======= -->
+    <div class="dashboard-grid">
+
+      <div class="card">
+        <div class="card__header">
+          <h3 class="card__title">Task by Status</h3>
+        </div>
+        <div class="status-breakdown">
+          <div class="status-breakdown__item">
+            <span class="badge badge--todo">Todo</span>
+            <span class="status-breakdown__count">{{ dashboardData.task_by_status.todo }}</span>
+          </div>
+          <div class="status-breakdown__item">
+            <span class="badge badge--in_progress">In Progress</span>
+            <span class="status-breakdown__count">{{ dashboardData.task_by_status.in_progress }}</span>
+          </div>
+          <div class="status-breakdown__item">
+            <span class="badge badge--done">Done</span>
+            <span class="status-breakdown__count">{{ dashboardData.task_by_status.done }}</span>
+          </div>
+        </div>
+
+        <!-- Progress bar visual -->
+        <div class="progress-bar-group">
+          <div class="progress-bar">
+            <div class="progress-bar__fill progress-bar__fill--primary"
+              [style.width.%]="dashboardData.total_tasks > 0 ? (dashboardData.task_by_status.todo / dashboardData.total_tasks * 100) : 0">
+            </div>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-bar__fill progress-bar__fill--info"
+              [style.width.%]="dashboardData.total_tasks > 0 ? (dashboardData.task_by_status.in_progress / dashboardData.total_tasks * 100) : 0">
+            </div>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-bar__fill progress-bar__fill--success"
+              [style.width.%]="dashboardData.completion_percent">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ======= RECENT PROJECTS ======= -->
+      <div class="card">
+        <div class="card__header">
+          <h3 class="card__title">Recent Projects</h3>
+          <a routerLink="/projects" class="btn btn--ghost btn--sm" id="link-all-projects">View All</a>
+        </div>
+
+        <div *ngIf="dashboardData.recent_projects.length === 0" class="empty-state" style="padding: 24px">
+          <p>Belum ada project.</p>
+        </div>
+
+        <div class="recent-projects">
+          <div *ngFor="let project of dashboardData.recent_projects" class="recent-project-item">
+            <div class="recent-project-item__info">
+              <a [routerLink]="['/projects', project.id]" class="recent-project-item__name">
+                {{ project.name }}
+              </a>
+              <span class="text-xs text-muted" *ngIf="project.deadline">
+                Deadline: {{ project.deadline | date:'dd MMM yyyy' }}
+              </span>
+            </div>
+            <div class="recent-project-item__stats" *ngIf="project.task_counts">
+              <span class="badge badge--done">{{ project.task_counts.done }} done</span>
+              <span class="badge badge--in_progress">{{ project.task_counts.in_progress }} wip</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </ng-container>
+
+</div>

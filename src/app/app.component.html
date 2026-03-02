@@ -1,0 +1,89 @@
+<!-- Root layout TaskFlow -->
+<!-- Jika halaman auth: tampilkan hanya router-outlet (tanpa sidebar) -->
+<div *ngIf="isAuthPage">
+  <router-outlet></router-outlet>
+</div>
+
+<!-- Layout utama: sidebar + main content (hanya saat sudah login) -->
+<div class="app-layout" *ngIf="!isAuthPage && (currentUser$ | async) as user">
+
+  <!-- ==================== SIDEBAR ==================== -->
+  <aside class="sidebar" [class.sidebar--open]="isSidebarOpen" id="sidebar-nav">
+
+    <!-- Logo & Brand -->
+    <div class="sidebar__brand">
+      <svg class="sidebar__logo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M9 11l3 3L22 4"></path>
+        <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"></path>
+      </svg>
+      <span class="sidebar__brand-text">TaskFlow</span>
+    </div>
+
+    <!-- Navigation Links -->
+    <nav class="sidebar__nav">
+      <a routerLink="/dashboard" routerLinkActive="sidebar__link--active"
+         class="sidebar__link" id="nav-dashboard" (click)="isSidebarOpen = false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="7" height="7"></rect>
+          <rect x="14" y="3" width="7" height="7"></rect>
+          <rect x="14" y="14" width="7" height="7"></rect>
+          <rect x="3" y="14" width="7" height="7"></rect>
+        </svg>
+        Dashboard
+      </a>
+
+      <a routerLink="/projects" routerLinkActive="sidebar__link--active"
+         class="sidebar__link" id="nav-projects" (click)="isSidebarOpen = false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"></path>
+        </svg>
+        Projects
+      </a>
+    </nav>
+
+    <!-- User Info di bawah sidebar -->
+    <div class="sidebar__user">
+      <div class="sidebar__user-avatar">{{ user.name.charAt(0).toUpperCase() }}</div>
+      <div class="sidebar__user-info">
+        <p class="sidebar__user-name">{{ user.name }}</p>
+        <span class="sidebar__user-role badge badge--{{ user.role }}">{{ user.role }}</span>
+      </div>
+      <button class="sidebar__logout-btn" id="btn-logout-sidebar"
+              (click)="confirmLogout()" title="Logout">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"></path>
+          <polyline points="16 17 21 12 16 7"></polyline>
+          <line x1="21" y1="12" x2="9" y2="12"></line>
+        </svg>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Overlay untuk mobile (klik untuk tutup sidebar) -->
+  <div class="sidebar__overlay" *ngIf="isSidebarOpen" (click)="isSidebarOpen = false"></div>
+
+  <!-- ==================== MAIN CONTENT ==================== -->
+  <main class="main-content">
+    <!-- Top bar mobile (toggle sidebar) -->
+    <header class="topbar">
+      <button class="topbar__menu-btn" id="btn-toggle-sidebar" (click)="toggleSidebar()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+      <span class="topbar__title">TaskFlow</span>
+    </header>
+
+    <!-- Router outlet: halaman akan render di sini -->
+    <div class="page-content">
+      <router-outlet></router-outlet>
+    </div>
+  </main>
+</div>
+
+<!-- State: tidak login dan bukan halaman auth → redirect otomatis via guard -->
+<div *ngIf="!isAuthPage && !(currentUser$ | async)">
+  <router-outlet></router-outlet>
+</div>

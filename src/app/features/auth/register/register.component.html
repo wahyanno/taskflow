@@ -1,0 +1,101 @@
+<!-- ==================== REGISTER PAGE ==================== -->
+<div class="auth-page">
+  <div class="auth-card">
+
+    <!-- Header -->
+    <div class="auth-card__header">
+      <div class="auth-card__logo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M9 11l3 3L22 4"></path>
+          <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"></path>
+        </svg>
+      </div>
+      <h1 class="auth-card__title">Create Account</h1>
+      <p class="auth-card__subtitle">Join TaskFlow and start managing tasks</p>
+    </div>
+
+    <!-- Register Form -->
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="auth-form" id="form-register" novalidate>
+
+      <!-- Name -->
+      <div class="form-group">
+        <label for="input-name">Full Name</label>
+        <input
+          id="input-name"
+          type="text"
+          formControlName="name"
+          class="form-control"
+          [class.is-invalid]="name.invalid && name.touched"
+          placeholder="John Doe"
+          autocomplete="name"
+        />
+        <p class="form-error" *ngIf="name.invalid && name.touched">
+          <ng-container *ngIf="name.errors?.['required']">Nama wajib diisi.</ng-container>
+          <ng-container *ngIf="name.errors?.['minlength']">Nama minimal 2 karakter.</ng-container>
+        </p>
+      </div>
+
+      <!-- Email -->
+      <div class="form-group">
+        <label for="input-register-email">Email</label>
+        <input
+          id="input-register-email"
+          type="email"
+          formControlName="email"
+          class="form-control"
+          [class.is-invalid]="email.invalid && email.touched"
+          placeholder="you@example.com"
+          autocomplete="email"
+        />
+        <p class="form-error" *ngIf="email.invalid && email.touched">
+          <ng-container *ngIf="email.errors?.['required']">Email wajib diisi.</ng-container>
+          <ng-container *ngIf="email.errors?.['email']">Format email tidak valid.</ng-container>
+        </p>
+      </div>
+
+      <!-- Password -->
+      <div class="form-group">
+        <label for="input-register-password">Password</label>
+        <div class="input-password-wrapper">
+          <input
+            id="input-register-password"
+            [type]="showPassword ? 'text' : 'password'"
+            formControlName="password"
+            class="form-control"
+            [class.is-invalid]="password.invalid && password.touched"
+            placeholder="Minimal 6 karakter"
+            autocomplete="new-password"
+          />
+          <button type="button" class="password-toggle" (click)="showPassword = !showPassword" id="btn-toggle-reg-password">
+            <svg *ngIf="!showPassword" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+            <svg *ngIf="showPassword" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94"></path>
+              <path d="M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19"></path>
+              <line x1="1" y1="1" x2="23" y2="23"></line>
+            </svg>
+          </button>
+        </div>
+        <p class="form-error" *ngIf="password.invalid && password.touched">
+          <ng-container *ngIf="password.errors?.['required']">Password wajib diisi.</ng-container>
+          <ng-container *ngIf="password.errors?.['minlength']">Password minimal 6 karakter.</ng-container>
+        </p>
+      </div>
+
+      <!-- Submit -->
+      <button type="submit" class="btn btn--primary btn--full" id="btn-register-submit" [disabled]="isLoading">
+        <span *ngIf="isLoading" class="btn-spinner"></span>
+        <span>{{ isLoading ? 'Creating account...' : 'Create Account' }}</span>
+      </button>
+
+    </form>
+
+    <p class="auth-card__footer">
+      Sudah punya akun?
+      <a routerLink="/auth/login" id="link-to-login">Sign in</a>
+    </p>
+
+  </div>
+</div>

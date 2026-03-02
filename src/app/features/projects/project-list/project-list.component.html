@@ -1,0 +1,160 @@
+<!-- Project List Page -->
+<div class="projects-page">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h2 class="page-header__title">Projects</h2>
+      <p class="page-header__subtitle">{{ total }} project{{ total !== 1 ? 's' : '' }} found</p>
+    </div>
+    <button *ngIf="canCreateProject" class="btn btn--primary" id="btn-create-project"
+            (click)="showCreateModal = true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="12" y1="5" x2="12" y2="19"></line>
+        <line x1="5" y1="12" x2="19" y2="12"></line>
+      </svg>
+      New Project
+    </button>
+  </div>
+
+  <!-- Filter bar -->
+  <div class="filter-bar">
+    <select id="select-status-filter" [(ngModel)]="statusFilter" (change)="applyFilter()" class="form-control" style="width: auto; min-width: 160px">
+      <option value="">All Status</option>
+      <option value="active">Active</option>
+      <option value="completed">Completed</option>
+    </select>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="loading-spinner">
+    <div class="spinner"></div>
+    <span>Memuat projects...</span>
+  </div>
+
+  <!-- Empty state -->
+  <div *ngIf="!isLoading && projects.length === 0" class="empty-state">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+      <path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"></path>
+    </svg>
+    <h3>Belum ada project</h3>
+    <p>Buat project pertama Anda untuk mulai mengelola tasks.</p>
+    <button *ngIf="canCreateProject" class="btn btn--primary" (click)="showCreateModal = true">
+      Buat Project
+    </button>
+  </div>
+
+  <!-- Projects Grid -->
+  <div class="projects-grid" *ngIf="!isLoading && projects.length > 0">
+    <div *ngFor="let project of projects" class="project-card">
+      <div class="project-card__header">
+        <h3 class="project-card__name">
+          <a [routerLink]="['/projects', project.id]" id="link-project-{{ project.id }}">
+            {{ project.name }}
+          </a>
+        </h3>
+        <span class="badge badge--{{ project.status }}">{{ project.status }}</span>
+      </div>
+
+      <p class="project-card__desc" *ngIf="project.description">
+        {{ project.description | slice:0:100 }}{{ project.description!.length > 100 ? '...' : '' }}
+      </p>
+
+      <div class="project-card__meta" *ngIf="project.deadline">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+          <line x1="16" y1="2" x2="16" y2="6"></line>
+          <line x1="8" y1="2" x2="8" y2="6"></line>
+          <line x1="3" y1="10" x2="21" y2="10"></line>
+        </svg>
+        {{ project.deadline | date:'dd MMM yyyy' }}
+      </div>
+
+      <!-- Task counts -->
+      <div class="project-card__tasks" *ngIf="project.task_counts">
+        <div class="task-count task-count--todo">
+          <span>{{ project.task_counts.todo }}</span> Todo
+        </div>
+        <div class="task-count task-count--in-progress">
+          <span>{{ project.task_counts.in_progress }}</span> In Progress
+        </div>
+        <div class="task-count task-count--done">
+          <span>{{ project.task_counts.done }}</span> Done
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="project-card__actions">
+        <a [routerLink]="['/projects', project.id]" class="btn btn--primary btn--sm" id="btn-view-project-{{ project.id }}">
+          View Tasks
+        </a>
+        <button *ngIf="canDeleteProject" class="btn btn--ghost btn--sm"
+                id="btn-delete-project-{{ project.id }}"
+                (click)="onDeleteProject(project)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6l-1 14H6L5 6"></path>
+            <path d="M10 11v6"></path><path d="M14 11v6"></path>
+            <path d="M9 6V4h6v2"></path>
+          </svg>
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  <div class="pagination" *ngIf="!isLoading && totalPages > 1">
+    <button class="btn btn--ghost btn--sm" [disabled]="currentPage <= 1" (click)="goToPage(currentPage - 1)" id="btn-prev-page">
+      ← Prev
+    </button>
+    <span class="pagination__info">{{ currentPage }} / {{ totalPages }}</span>
+    <button class="btn btn--ghost btn--sm" [disabled]="currentPage >= totalPages" (click)="goToPage(currentPage + 1)" id="btn-next-page">
+      Next →
+    </button>
+  </div>
+
+</div>
+
+<!-- ==================== CREATE PROJECT MODAL ==================== -->
+<div class="modal-overlay" *ngIf="showCreateModal" (click)="showCreateModal = false" id="modal-create-project-overlay"></div>
+<div class="modal" *ngIf="showCreateModal" id="modal-create-project">
+  <div class="modal__header">
+    <h3 class="modal__title">Create New Project</h3>
+    <button class="modal__close" (click)="showCreateModal = false" id="btn-close-create-modal">✕</button>
+  </div>
+
+  <form [formGroup]="projectForm" (ngSubmit)="onCreateProject()" id="form-create-project" novalidate>
+    <div class="modal__body">
+
+      <div class="form-group">
+        <label for="input-project-name">Project Name *</label>
+        <input id="input-project-name" type="text" formControlName="name" class="form-control"
+               [class.is-invalid]="name.invalid && name.touched" placeholder="Nama project..."/>
+        <p class="form-error" *ngIf="name.invalid && name.touched">
+          <ng-container *ngIf="name.errors?.['required']">Nama project wajib diisi.</ng-container>
+          <ng-container *ngIf="name.errors?.['minlength']">Minimal 3 karakter.</ng-container>
+        </p>
+      </div>
+
+      <div class="form-group">
+        <label for="input-project-desc">Description</label>
+        <textarea id="input-project-desc" formControlName="description" class="form-control"
+                  rows="3" placeholder="Deskripsi singkat project..."></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="input-project-deadline">Deadline</label>
+        <input id="input-project-deadline" type="date" formControlName="deadline" class="form-control"/>
+      </div>
+
+    </div>
+    <div class="modal__footer">
+      <button type="button" class="btn btn--ghost" (click)="showCreateModal = false" id="btn-cancel-create">Batal</button>
+      <button type="submit" class="btn btn--primary" id="btn-submit-project" [disabled]="isSubmitting">
+        <span *ngIf="isSubmitting" class="btn-spinner"></span>
+        {{ isSubmitting ? 'Creating...' : 'Create Project' }}
+      </button>
+    </div>
+  </form>
+</div>

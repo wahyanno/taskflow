@@ -1,0 +1,190 @@
+/* Project List + shared modal styles */
+.projects-page {
+  max-width: 1100px;
+}
+
+.filter-bar {
+  display: flex;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+  align-items: center;
+}
+
+/* Project cards grid */
+.projects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-xl);
+}
+
+.project-card {
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-md);
+  padding: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  transition: border-color 0.2s, box-shadow 0.2s;
+
+  &:hover {
+    border-color: rgba(99,102,241,0.4);
+    box-shadow: var(--shadow-sm);
+  }
+
+  &__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--spacing-sm);
+  }
+
+  &__name {
+    font-size: var(--font-size-base);
+    font-weight: 600;
+
+    a {
+      color: var(--color-text);
+      text-decoration: none;
+      &:hover { color: var(--color-primary-light); }
+    }
+  }
+
+  &__desc {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-muted);
+    line-height: 1.5;
+  }
+
+  &__meta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: var(--font-size-xs);
+    color: var(--color-text-dim);
+
+    svg { width: 14px; height: 14px; }
+  }
+
+  &__tasks {
+    display: flex;
+    gap: var(--spacing-sm);
+    margin-top: 4px;
+  }
+
+  &__actions {
+    display: flex;
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-sm);
+    padding-top: var(--spacing-sm);
+    border-top: 1px solid var(--color-border);
+  }
+}
+
+.task-count {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+
+  span {
+    font-size: var(--font-size-base);
+    font-weight: 700;
+  }
+
+  &--todo       span { color: var(--color-text-muted); }
+  &--in-progress span { color: var(--color-info); }
+  &--done       span { color: var(--color-success); }
+}
+
+/* Pagination */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-md);
+
+  &__info {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-muted);
+  }
+}
+
+/* ==================== MODAL ==================== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 200;
+  backdrop-filter: blur(4px);
+}
+
+.modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 201;
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-lg);
+  width: 100%;
+  max-width: 500px;
+  box-shadow: var(--shadow-lg);
+  animation: modal-in 0.2s ease;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--spacing-lg);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  &__title {
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+  }
+
+  &__close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--color-text-muted);
+    font-size: var(--font-size-lg);
+    padding: 4px 8px;
+    border-radius: var(--border-radius-sm);
+    line-height: 1;
+
+    &:hover { background: var(--color-bg-tertiary); color: var(--color-text); }
+  }
+
+  &__body {
+    padding: var(--spacing-lg);
+  }
+
+  &__footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md) var(--spacing-lg);
+    border-top: 1px solid var(--color-border);
+  }
+}
+
+@keyframes modal-in {
+  from { opacity: 0; transform: translate(-50%, -52%); }
+  to   { opacity: 1; transform: translate(-50%, -50%); }
+}
+
+.btn-spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}

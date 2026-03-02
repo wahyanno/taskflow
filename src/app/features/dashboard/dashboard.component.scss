@@ -1,0 +1,108 @@
+/* Dashboard page styles */
+.dashboard-page {
+  max-width: 1100px;
+}
+
+/* Two-column grid for the lower section */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-md);
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Status breakdown rows */
+.status-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+
+  &__item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--spacing-sm) 0;
+    border-bottom: 1px solid var(--color-border);
+
+    &:last-child { border-bottom: none; }
+  }
+
+  &__count {
+    font-size: var(--font-size-lg);
+    font-weight: 700;
+    color: var(--color-text);
+  }
+}
+
+/* Progress bars */
+.progress-bar-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.progress-bar {
+  height: 8px;
+  background: var(--color-bg-tertiary);
+  border-radius: var(--border-radius-full);
+  overflow: hidden;
+
+  &__fill {
+    height: 100%;
+    border-radius: var(--border-radius-full);
+    transition: width 0.6s ease;
+    min-width: 2px;
+
+    &--primary { background: var(--color-text-dim); }
+    &--info    { background: var(--color-info); }
+    &--success { background: var(--color-success); }
+  }
+}
+
+/* Recent projects list */
+.recent-projects {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.recent-project-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-sm) 0;
+  border-bottom: 1px solid var(--color-border);
+  gap: var(--spacing-md);
+
+  &:last-child { border-bottom: none; }
+
+  &__info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__name {
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    color: var(--color-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-decoration: none;
+
+    &:hover { color: var(--color-primary-light); }
+  }
+
+  &__stats {
+    display: flex;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+}
