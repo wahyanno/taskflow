@@ -23,82 +23,74 @@ import { ApiResponse, PaginatedResponse, Project } from '../models/models';
 export class ProjectService {
   private readonly baseUrl = `${environment.apiUrl}/projects`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   /**
+   * POST /project/index
    * Ambil list semua project dengan pagination dan filter opsional
-   *
-   * @param page - Nomor halaman (default 1)
-   * @param perPage - Jumlah item per halaman (default 10)
-   * @param status - Filter status ('active' | 'completed' | undefined)
-   * @returns Observable<ApiResponse<PaginatedResponse<Project>>>
    */
   getProjects(page = 1, perPage = 10, status?: string): Observable<ApiResponse<PaginatedResponse<Project>>> {
-    let params = new HttpParams()
-      .set('page', page.toString())
-      .set('per_page', perPage.toString());
-
-    if (status) {
-      params = params.set('status', status);
-    }
-
-    return this.http.get<ApiResponse<PaginatedResponse<Project>>>(this.baseUrl, { params });
+    return this.http.post<ApiResponse<PaginatedResponse<Project>>>(`${environment.apiUrl}/project/index`, {
+      page,
+      per_page: perPage,
+      status
+    });
   }
 
   /**
+   * POST /projects/view
    * Ambil detail sebuah project beserta daftar member dan statistik task
-   *
-   * @param id - Project ID
    */
   getProject(id: number): Observable<ApiResponse<{ project: Project; members: any[]; task_counts: any }>> {
-    return this.http.get<ApiResponse<any>>(`${this.baseUrl}/${id}`);
+    return this.http.post<ApiResponse<any>>(`${environment.apiUrl}/project/view`, { id });
   }
 
   /**
+   * POST /projects/create
    * Buat project baru (Manager/Admin only)
-   *
-   * @param data - { name, description?, deadline? }
    */
   createProject(data: { name: string; description?: string; deadline?: string }): Observable<ApiResponse<{ project: Project }>> {
-    return this.http.post<ApiResponse<{ project: Project }>>(this.baseUrl, data);
+    return this.http.post<ApiResponse<{ project: Project }>>(`${environment.apiUrl}/project/create`, data);
   }
 
   /**
+   * POST /project/update
    * Update data project
-   *
-   * @param id - Project ID
-   * @param data - Field yang ingin diupdate
    */
   updateProject(id: number, data: Partial<Project>): Observable<ApiResponse<{ project: Project }>> {
-    return this.http.put<ApiResponse<{ project: Project }>>(`${this.baseUrl}/${id}`, data);
+    return this.http.post<ApiResponse<{ project: Project }>>(`${environment.apiUrl}/project/update`, {
+      id,
+      ...data
+    });
   }
 
   /**
+   * POST /projects/delete
    * Hapus project (Admin only)
-   *
-   * @param id - Project ID
    */
   deleteProject(id: number): Observable<ApiResponse<null>> {
-    return this.http.delete<ApiResponse<null>>(`${this.baseUrl}/${id}`);
+    return this.http.post<ApiResponse<null>>(`${environment.apiUrl}/project/delete`, { id });
   }
 
   /**
+   * POST /project/add-member
    * Tambah user sebagai anggota project
-   *
-   * @param projectId - Project ID
-   * @param userId - User ID yang akan ditambahkan
    */
   addMember(projectId: number, userId: number): Observable<ApiResponse<any>> {
-    return this.http.post<ApiResponse<any>>(`${this.baseUrl}/${projectId}/members`, { user_id: userId });
+    return this.http.post<ApiResponse<any>>(`${environment.apiUrl}/project/add-member`, {
+      project_id: projectId,
+      user_id: userId
+    });
   }
 
   /**
+   * POST /project/remove-member
    * Hapus user dari anggota project
-   *
-   * @param projectId - Project ID
-   * @param userId - User ID yang akan dihapus
    */
   removeMember(projectId: number, userId: number): Observable<ApiResponse<null>> {
-    return this.http.delete<ApiResponse<null>>(`${this.baseUrl}/${projectId}/members/${userId}`);
+    return this.http.post<ApiResponse<null>>(`${environment.apiUrl}/project/remove-member`, {
+      project_id: projectId,
+      user_id: userId
+    });
   }
 }

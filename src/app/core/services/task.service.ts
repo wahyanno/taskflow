@@ -25,13 +25,8 @@ export class TaskService {
   constructor(private http: HttpClient) { }
 
   /**
+   * POST /tasks/list
    * Ambil list task dalam sebuah project
-   *
-   * @param projectId - Project ID
-   * @param page - Nomor halaman
-   * @param perPage - Item per halaman
-   * @param status - Filter status task
-   * @param priority - Filter priority task
    */
   getTasks(
     projectId: number,
@@ -40,32 +35,29 @@ export class TaskService {
     status?: string,
     priority?: string
   ): Observable<ApiResponse<PaginatedResponse<Task>>> {
-    let params = new HttpParams()
-      .set('page', page.toString())
-      .set('per_page', perPage.toString());
-
-    if (status) params = params.set('status', status);
-    if (priority) params = params.set('priority', priority);
-
-    return this.http.get<ApiResponse<PaginatedResponse<Task>>>(
-      `${this.baseUrl}/projects/${projectId}/tasks`,
-      { params }
+    return this.http.post<ApiResponse<PaginatedResponse<Task>>>(
+      `${environment.apiUrl}/task/index`,
+      {
+        project_id: projectId,
+        page,
+        per_page: perPage,
+        status,
+        priority
+      }
     );
   }
 
   /**
+   * POST /tasks/view
    * Ambil detail single task
-   *
-   * @param id - Task ID
    */
   getTask(id: number): Observable<ApiResponse<{ task: Task }>> {
-    return this.http.get<ApiResponse<{ task: Task }>>(`${this.baseUrl}/tasks/${id}`);
+    return this.http.post<ApiResponse<{ task: Task }>>(`${environment.apiUrl}/task/view`, { id });
   }
 
   /**
+   * POST /tasks/create
    * Buat task baru
-   *
-   * @param data - Task data (project_id wajib, title wajib)
    */
   createTask(data: {
     project_id: number;
@@ -74,48 +66,46 @@ export class TaskService {
     assigned_to?: number;
     priority?: string;
     due_date?: string;
-    /** Initial status — slug dari project_statuses (default: slug pertama di project) */
     status?: string;
   }): Observable<ApiResponse<{ task: Task }>> {
-    return this.http.post<ApiResponse<{ task: Task }>>(`${this.baseUrl}/tasks`, data);
+    return this.http.post<ApiResponse<{ task: Task }>>(`${environment.apiUrl}/task/create`, data);
   }
 
   /**
+   * POST /tasks/update
    * Update data task
-   *
-   * @param id - Task ID
-   * @param data - Field yang ingin diupdate
    */
   updateTask(id: number, data: Partial<Task>): Observable<ApiResponse<{ task: Task }>> {
-    return this.http.put<ApiResponse<{ task: Task }>>(`${this.baseUrl}/tasks/${id}`, data);
+    return this.http.post<ApiResponse<{ task: Task }>>(`${environment.apiUrl}/task/update`, {
+      id,
+      ...data
+    });
   }
 
   /**
-   * Update status task saja (PATCH — lebih efisien dari full update)
-   * Mendukung slug custom status selain 'todo', 'in_progress', 'done'.
-   *
-   * @param id - Task ID
-   * @param status - Slug status baru (dari project_statuses)
+   * POST /tasks/update-status
+   * Update status task saja
    */
   updateTaskStatus(id: number, status: string): Observable<ApiResponse<any>> {
-    return this.http.patch<ApiResponse<any>>(`${this.baseUrl}/tasks/${id}/status`, { status });
+    return this.http.post<ApiResponse<any>>(`${environment.apiUrl}/task/update-status`, {
+      id,
+      status
+    });
   }
 
   /**
+   * POST /tasks/delete
    * Hapus task
-   *
-   * @param id - Task ID
    */
   deleteTask(id: number): Observable<ApiResponse<null>> {
-    return this.http.delete<ApiResponse<null>>(`${this.baseUrl}/tasks/${id}`);
+    return this.http.post<ApiResponse<null>>(`${environment.apiUrl}/task/delete`, { id });
   }
 
   /**
+   * POST /tasks/logs
    * Ambil activity logs sebuah task (riwayat perubahan)
-   *
-   * @param id - Task ID
    */
   getTaskLogs(id: number): Observable<ApiResponse<{ logs: TaskActivityLog[] }>> {
-    return this.http.get<ApiResponse<{ logs: TaskActivityLog[] }>>(`${this.baseUrl}/tasks/${id}/logs`);
+    return this.http.post<ApiResponse<{ logs: TaskActivityLog[] }>>(`${environment.apiUrl}/task/logs`, { id });
   }
 }

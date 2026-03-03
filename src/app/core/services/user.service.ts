@@ -19,29 +19,35 @@ export class UserService {
     constructor(private http: HttpClient) { }
 
     /**
-     * GET /users
-     *
-     * Mengambil semua user aktif di sistem.
-     * Digunakan untuk dropdown "Assign To" saat membuat task.
-     *
-     * Output: Observable<ApiResponse<{ users: User[] }>>
+     * POST /users/list
+     * Mengambil semua user aktif di sistem
      */
     getUsers(): Observable<ApiResponse<{ users: User[] }>> {
-        return this.http.get<ApiResponse<{ users: User[] }>>(
-            `${environment.apiUrl}/users`
+        return this.http.post<ApiResponse<{ users: User[] }>>(
+            `${environment.apiUrl}/user/index`,
+            {}
         );
     }
 
     /**
-     * GET /users/me
-     *
-     * Mengambil profil user yang sedang login berdasarkan JWT token.
-     *
-     * Output: Observable<ApiResponse<{ user: User }>>
+     * POST /users/me
+     * Mengambil profil user yang sedang login
      */
     getMe(): Observable<ApiResponse<{ user: User }>> {
-        return this.http.get<ApiResponse<{ user: User }>>(
-            `${environment.apiUrl}/users/me`
+        return this.http.post<ApiResponse<{ user: User }>>(
+            `${environment.apiUrl}/user/me`,
+            {}
+        );
+    }
+
+    /**
+     * POST /users/update-profile
+     * Update profil user login
+     */
+    updateProfile(data: Partial<User>): Observable<ApiResponse<{ user: User }>> {
+        return this.http.post<ApiResponse<{ user: User }>>(
+            `${environment.apiUrl}/user/update-profile`,
+            data
         );
     }
 }

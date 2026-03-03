@@ -11,14 +11,13 @@ import { ApiResponse, DashboardData } from '../models/models';
   providedIn: 'root'
 })
 export class DashboardService {
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   /**
+   * POST /dashboard/index
    * Ambil data statistik dashboard (sesuai role user yang login)
-   *
-   * @returns Observable<ApiResponse<DashboardData>>
    */
   getDashboard(): Observable<ApiResponse<DashboardData>> {
-    return this.http.get<ApiResponse<DashboardData>>(`${environment.apiUrl}/dashboard`);
+    return this.http.post<ApiResponse<DashboardData>>(`${environment.apiUrl}/dashboard/index`, {});
   }
 }

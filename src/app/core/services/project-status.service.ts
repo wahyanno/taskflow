@@ -21,80 +21,57 @@ export class ProjectStatusService {
     constructor(private http: HttpClient) { }
 
     /**
-     * GET /projects/:projectId/statuses
-     *
-     * Ambil semua custom status dalam sebuah project,
-     * beserta jumlah task per status.
-     *
-     * Output: Observable<ApiResponse<{ statuses: ProjectStatus[], can_manage: boolean }>>
+     * POST /projects/statuses/list
+     * Ambil semua custom status dalam sebuah project
      */
     getStatuses(projectId: number): Observable<ApiResponse<{ statuses: ProjectStatus[]; can_manage: boolean }>> {
-        return this.http.get<ApiResponse<{ statuses: ProjectStatus[]; can_manage: boolean }>>(
-            `${environment.apiUrl}/projects/${projectId}/statuses`
+        return this.http.post<ApiResponse<{ statuses: ProjectStatus[]; can_manage: boolean }>>(
+            `${environment.apiUrl}/project-status/index`,
+            { id: projectId }
         );
     }
 
     /**
-     * POST /projects/:projectId/statuses
-     *
-     * Tambah status baru ke project.
-     * Hanya admin/manager.
-     *
-     * Input  : { name: string, color?: string }
-     * Output : Observable<ApiResponse<{ status: ProjectStatus }>>
+     * POST /projects/statuses/create
+     * Tambah status baru ke project
      */
     createStatus(projectId: number, payload: { name: string; color?: string }): Observable<ApiResponse<{ status: ProjectStatus }>> {
         return this.http.post<ApiResponse<{ status: ProjectStatus }>>(
-            `${environment.apiUrl}/projects/${projectId}/statuses`,
-            payload
+            `${environment.apiUrl}/project-status/create`,
+            { id: projectId, ...payload }
         );
     }
 
     /**
-     * PUT /projects/:projectId/statuses/:statusId
-     *
-     * Edit nama atau warna status.
-     * Slug tidak bisa diubah (menjaga konsistensi task existing).
-     *
-     * Input  : { name?: string, color?: string }
-     * Output : Observable<ApiResponse<{ status: ProjectStatus }>>
+     * POST /projects/statuses/update
+     * Edit nama atau warna status
      */
     updateStatus(projectId: number, statusId: number, payload: { name?: string; color?: string }): Observable<ApiResponse<{ status: ProjectStatus }>> {
-        return this.http.put<ApiResponse<{ status: ProjectStatus }>>(
-            `${environment.apiUrl}/projects/${projectId}/statuses/${statusId}`,
-            payload
+        return this.http.post<ApiResponse<{ status: ProjectStatus }>>(
+            `${environment.apiUrl}/project-status/update`,
+            { id: projectId, sid: statusId, ...payload }
         );
     }
 
     /**
-     * DELETE /projects/:projectId/statuses/:statusId
-     *
-     * Hapus status dari project.
-     * Akan gagal jika masih ada task di status itu.
-     *
-     * Output : Observable<ApiResponse<{ deleted: boolean }>>
+     * POST /projects/statuses/delete
+     * Hapus status dari project
      */
     deleteStatus(projectId: number, statusId: number): Observable<ApiResponse<{ deleted: boolean }>> {
-        return this.http.delete<ApiResponse<{ deleted: boolean }>>(
-            `${environment.apiUrl}/projects/${projectId}/statuses/${statusId}`
+        return this.http.post<ApiResponse<{ deleted: boolean }>>(
+            `${environment.apiUrl}/project-status/delete`,
+            { id: projectId, sid: statusId }
         );
     }
 
     /**
-     * PUT /projects/:projectId/statuses/reorder
-     *
-     * Simpan urutan baru status. Menerima array ID status dalam urutan yang diinginkan.
-     * Backend akan update kolom `position` berdasarkan index array.
-     *
-     * @param projectId  - ID project
-     * @param order      - Array of status ID sesuai urutan baru (index 0 = posisi pertama)
-     *
-     * Output : Observable<ApiResponse<{ reordered: boolean, statuses: ProjectStatus[] }>>
+     * POST /projects/statuses/reorder
+     * Simpan urutan baru status
      */
     reorderStatuses(projectId: number, order: number[]): Observable<ApiResponse<{ reordered: boolean; statuses: ProjectStatus[] }>> {
-        return this.http.put<ApiResponse<{ reordered: boolean; statuses: ProjectStatus[] }>>(
-            `${environment.apiUrl}/projects/${projectId}/statuses/reorder`,
-            { order }
+        return this.http.post<ApiResponse<{ reordered: boolean; statuses: ProjectStatus[] }>>(
+            `${environment.apiUrl}/project-status/reorder`,
+            { id: projectId, order }
         );
     }
 }
