@@ -12,15 +12,17 @@ import { ProjectStatusService } from '../../../core/services/project-status.serv
 import { Project, Task, User, ProjectStatus } from '../../../core/models/models';
 
 /**
- * ProjectDetailComponent - Detail project dan manajemen tasks
+ * ProjectDetailComponent — Project detail view with task management.
  *
  * Features:
- * - Tampilkan info project (nama, deadline, members)
- * - List tasks dengan filter status
- * - Modal form buat task baru
- * - Update status task (inline dropdown)
- * - Hapus task dengan konfirmasi SweetAlert2
- * - Badge priority dan status task
+ * - Display project info (name, deadline, members)
+ * - Task list with status filter
+ * - Modal form for creating a new task
+ * - Inline status update via dropdown
+ * - Delete task with SweetAlert2 confirmation
+ * - Priority and status badges
+ * - Kanban board with drag & drop (CDK / HTML5)
+ * - Custom status drag-drop reordering
  */
 @Component({
   selector: 'app-project-detail',
@@ -30,60 +32,60 @@ import { Project, Task, User, ProjectStatus } from '../../../core/models/models'
 export class ProjectDetailComponent implements OnInit, OnDestroy {
   projectId!: number;
   project: Project | null = null;
-  /** Member project ini (untuk ditampilkan di header) */
+  /** Members of this project (shown in the header) */
   members: User[] = [];
-  /** Semua user aktif di sistem (untuk dropdown Assign To) */
+  /** All active users in the system (used in the Assign To dropdown) */
   allUsers: User[] = [];
   tasks: Task[] = [];
   isLoadingProject = true;
   isLoadingTasks = true;
 
-  /** Custom statuses project ini */
+  /** Custom statuses for this project */
   projectStatuses: ProjectStatus[] = [];
   isLoadingStatuses = false;
 
   /**
-   * Subject yang di-emit saat component di-destroy.
-   * Semua subscription yang pakai takeUntil(this.destroy$) akan otomatis di-cancel.
+   * Subject emitted when the component is destroyed.
+   * All subscriptions using takeUntil(this.destroy$) are automatically cancelled.
    */
   private destroy$ = new Subject<void>();
 
-  /** State modal buat task */
+  /** Show/hide create task modal */
   showCreateTaskModal = false;
   isSubmittingTask = false;
 
-  /** Filter tasks (hanya berlaku di table view) */
+  /** Task status filter (table view only) */
   taskStatusFilter = '';
 
-  /** Mode tampilan: 'table' atau 'kanban' */
+  /** View mode: 'table' or 'kanban' */
   viewMode: 'table' | 'kanban' = 'table';
 
-  /** Task yang sedang di-drag (untuk kanban drag-drop) */
+  /** The task currently being dragged (kanban drag & drop) */
   draggedTask: Task | null = null;
 
-  /** Kolom yang sedang di-hover saat drag (untuk highlight) */
+  /** The column being hovered during a drag (for highlight) */
   dragOverColumn: string | null = null;
 
   // ─── State: Manage Status Modal ────────────────────────────────────────────
   showStatusModal = false;
-  /** Status yang sedang di-edit (null = mode tambah baru) */
+  /** Status being edited (null = add new mode) */
   editingStatus: ProjectStatus | null = null;
   statusFormName = '';
   statusFormColor = 'gray';
   isSubmittingStatus = false;
 
   // ─── State: Drag-Drop Reorder Status List ───────────────────────────────────
-  /** Status yang sedang di-drag di modal list */
+  /** Status item currently being dragged in the modal list */
   draggingStatusId: number | null = null;
-  /** Status yang sedang di-hover saat drag (tujuan drop) */
+  /** Status item currently hovered during drag (drop target) */
   dragOverStatusId: number | null = null;
-  /** Menyimpan urutan asli sebagai referensi rollback */
+  /** Snapshot of the original order before drag — used for rollback */
   private _statusOrderBeforeDrag: ProjectStatus[] = [];
 
-  /** Form buat task */
+  /** Task creation form */
   taskForm: FormGroup;
 
-  /** User yang login */
+  /** Currently authenticated user */
   currentUser = this.authService.getCurrentUser();
 
   constructor(
@@ -101,7 +103,7 @@ export class ProjectDetailComponent implements OnInit, OnDestroy {
       assigned_to: [''],
       priority: ['medium'],
       due_date: [''],
-      status: ['todo'],  // default slug 'todo', akan diupdate saat statuses loaded
+      status: ['todo'], // default slug 'todo', updated after statuses are loaded
     });
   }
 
@@ -114,9 +116,8 @@ export class ProjectDetailComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Lifecycle hook: dipanggil saat component dihancurkan (navigasi pergi / logout).
-   * Emit destroy$ agar semua subscription yang pakai takeUntil(destroy$) otomatis di-cancel,
-   * sehingga tidak ada API request yang berjalan setelah user logout.
+   * Lifecycle hook: called when the component is destroyed (navigation / logout).
+   * Emits destroy$ to automatically cancel all active subscriptions.
    */
   ngOnDestroy(): void {
     this.destroy$.next();
@@ -127,28 +128,28 @@ export class ProjectDetailComponent implements OnInit, OnDestroy {
     return this.currentUser?.role === 'admin' || this.currentUser?.role === 'manager';
   }
 
-  // ─── Kanban getters: group tasks berdasarkan status ──────────────────────
+  // ─── Kanban getters: group tasks by status ───────────────────────────────
 
-  /** Tasks dengan status 'todo' */
+  /** Tasks with status 'todo' */
   get todoTasks(): Task[] {
     return this.tasks.filter(t => t.status === 'todo');
   }
 
-  /** Tasks dengan status 'in_progress' */
+  /** Tasks with status 'in_progress' */
   get inProgressTasks(): Task[] {
     return this.tasks.filter(t => t.status === 'in_progress');
   }
 
-  /** Tasks dengan status 'done' */
+  /** Tasks with status 'done' */
   get doneTasks(): Task[] {
     return this.tasks.filter(t => t.status === 'done');
   }
 
-  // ─── Drag & Drop handlers (HTML5 native API) ─────────────────────────────
+  // ─── Drag & Drop handlers (HTML5 native API) ──────────────────────────────
 
   /**
-   * Dipanggil saat task mulai di-drag
-   * Simpan referensi task yang sedang di-drag ke this.draggedTask
+   * Called when a task drag starts.
+   * Saves a reference to the dragged task.
    */
   onDragStart(event: DragEvent, task: Task): void {
     this.draggedTask = task;
@@ -156,17 +157,17 @@ export class ProjectDetailComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Dipanggil saat drag memasuki area drop (kolom kanban)
-   * Highlight kolom yang sedang di-hover
+   * Called when a dragged item enters a drop zone (kanban column).
+   * Highlights the column being hovered.
    */
   onDragOver(event: DragEvent, status: string): void {
-    event.preventDefault(); // Wajib untuk mengizinkan drop
+    event.preventDefault(); // Required to allow the drop
     event.dataTransfer!.dropEffect = 'move';
     this.dragOverColumn = status;
   }
 
   /**
-   * Dipanggil saat drag keluar dari area kolom
+   * Called when a dragged item leaves a column area.
    */
   onDragLeave(status: string): void {
     if (this.dragOverColumn === status) {
@@ -175,8 +176,8 @@ export class ProjectDetailComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Dipanggil saat task di-drop ke kolom
-   * Update status task jika berbeda dari status kolom tujuan
+   * Called when a task is dropped onto a column.
+   * Updates the task's status if it differs from the target column.
    */
   onDrop(event: DragEvent, newStatus: string): void {
     event.preventDefault();
@@ -188,18 +189,18 @@ export class ProjectDetailComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // Optimistic update: ubah status di UI dulu
+    // Optimistic update: change UI status immediately
     const task = this.draggedTask;
     const oldStatus = task.status;
     task.status = newStatus as 'todo' | 'in_progress' | 'done';
     this.draggedTask = null;
 
-    // Kirim update ke API
+    // Persist to API
     this.onStatusChange(task, newStatus, oldStatus);
   }
 
   /**
-   * Dipanggil saat drag selesai (drop atau dibatalkan)
+   * Called when a drag ends (dropped or cancelled).
    */
   onDragEnd(): void {
     this.draggedTask = null;
@@ -209,8 +210,8 @@ export class ProjectDetailComponent implements OnInit, OnDestroy {
   // ─── Status Management ────────────────────────────────────────────────────
 
   /**
-   * Load custom statuses milik project ini dari API.
-   * Digunakan untuk mengisi kolom kanban dan dropdown status di form.
+   * Load custom statuses for this project from the API.
+   * Used to populate kanban columns and the status dropdown in the task form.
    */
   loadStatuses(): void {
     this.isLoadingStatuses = true;
@@ -228,17 +229,17 @@ export class ProjectDetailComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Helper: ambil tasks berdasarkan slug status (untuk kanban view).
-   * Menggantikan todoTasks/inProgressTasks/doneTasks yang hardcoded.
+   * Helper: return tasks matching a given status slug (for kanban view).
+   * Replaces the hardcoded todoTasks / inProgressTasks / doneTasks getters.
    *
-   * @param slug - slug status (misal: 'todo', 'in_progress', 'done', atau custom)
+   * @param slug - Status slug (e.g. 'todo', 'in_progress', 'done', or custom)
    */
   getTasksByStatus(slug: string): Task[] {
     return this.tasks.filter(t => t.status === slug);
   }
 
   /**
-   * Helper: cari nama tampilan status berdasarkan slug.
+   * Helper: resolve a status display name from its slug.
    */
   getStatusName(slug: string): string {
     const found = this.projectStatuses.find(s => s.slug === slug);
@@ -246,10 +247,10 @@ export class ProjectDetailComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Buka modal manage status.
-   * Jika status dikirim, mode edit; jika tidak, mode tambah baru.
+   * Open the manage-status modal.
+   * If a status is passed, enter edit mode; otherwise enter add-new mode.
    *
-   * @param status - ProjectStatus untuk mode edit, atau null untuk tambah baru
+   * @param status - ProjectStatus to edit, or null to add a new one
    */
   openStatusModal(status: ProjectStatus | null = null): void {
     this.editingStatus = status;
@@ -259,11 +260,11 @@ export class ProjectDetailComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Submit form manage status (create atau update).
+   * Submit the manage-status form (create or update).
    */
   onSaveStatus(): void {
     if (!this.statusFormName.trim()) {
-      Swal.fire({ icon: 'warning', text: 'Nama status tidak boleh kosong.', toast: true, position: 'top-end', timer: 2500, showConfirmButton: false });
+      Swal.fire({ icon: 'warning', text: 'Status name cannot be empty.', toast: true, position: 'top-end', timer: 2500, showConfirmButton: false });
       return;
     }
 
@@ -279,35 +280,35 @@ export class ProjectDetailComponent implements OnInit, OnDestroy {
         this.isSubmittingStatus = false;
         if (res.status === 'success') {
           this.showStatusModal = false;
-          Swal.fire({ icon: 'success', text: this.editingStatus ? 'Status diperbarui.' : 'Status ditambahkan.', toast: true, position: 'top-end', timer: 2000, showConfirmButton: false });
+          Swal.fire({ icon: 'success', text: this.editingStatus ? 'Status updated.' : 'Status added.', toast: true, position: 'top-end', timer: 2000, showConfirmButton: false });
           this.loadStatuses();
         }
       },
       error: (err) => {
         this.isSubmittingStatus = false;
-        Swal.fire({ icon: 'error', title: 'Gagal', text: err.error?.message || 'Terjadi kesalahan.', confirmButtonColor: '#6366f1' });
+        Swal.fire({ icon: 'error', title: 'Error', text: err.error?.message || 'An error occurred.', confirmButtonColor: '#6366f1' });
       }
     });
   }
 
   /**
-   * Konfirmasi dan hapus status.
-   * Backend akan menolak jika masih ada task di status itu.
+   * Show confirmation dialog, then delete the status.
+   * The backend will reject the request if tasks still exist under this status.
    *
-   * @param status - Status yang akan dihapus
+   * @param status - The status to delete
    */
   async onDeleteStatus(status: ProjectStatus): Promise<void> {
     const result = await Swal.fire({
-      title: `Hapus Status "${status.name}"?`,
+      title: `Delete Status "${status.name}"?`,
       html: status.task_count && status.task_count > 0
-        ? `<span class="text-danger">Ada <strong>${status.task_count} task</strong> di status ini. Pindahkan dulu sebelum menghapus.</span>`
-        : `Status ini akan dihapus permanen dari project.`,
+        ? `<span class="text-danger">There are <strong>${status.task_count} task(s)</strong> assigned to this status. Move them before deleting.</span>`
+        : `This status will be permanently removed from the project.`,
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#ef4444',
       cancelButtonColor: '#6b7280',
-      confirmButtonText: 'Hapus',
-      cancelButtonText: 'Batal',
+      confirmButtonText: 'Delete',
+      cancelButtonText: 'Cancel',
     });
 
     if (!result.isConfirmed) return;
@@ -316,12 +317,12 @@ export class ProjectDetailComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {
-          Swal.fire({ icon: 'success', text: 'Status dihapus.', toast: true, position: 'top-end', timer: 2000, showConfirmButton: false });
+          Swal.fire({ icon: 'success', text: 'Status deleted.', toast: true, position: 'top-end', timer: 2000, showConfirmButton: false });
           this.loadStatuses();
-          this.loadTasks(); // Refresh tasks jika ada yang terpengaruh
+          this.loadTasks(); // Refresh tasks in case any were affected
         },
         error: (err) => {
-          Swal.fire({ icon: 'error', title: 'Gagal Hapus', text: err.error?.message || 'Terjadi kesalahan.', confirmButtonColor: '#6366f1' });
+          Swal.fire({ icon: 'error', title: 'Delete Failed', text: err.error?.message || 'An error occurred.', confirmButtonColor: '#6366f1' });
         }
       });
   }
@@ -329,15 +330,15 @@ export class ProjectDetailComponent implements OnInit, OnDestroy {
   // ─── Drag-Drop: Reorder Status List ──────────────────────────────────────
 
   /**
-   * Dipanggil saat drag dimulai pada salah satu item status di modal.
-   * Menyimpan snapshot urutan asli sebagai referensi rollback.
+   * Called when a status item drag starts in the modal list.
+   * Saves a snapshot of the original order for rollback.
    *
-   * @param event  - DragEvent bawaan browser
-   * @param status - Status yang di-drag
+   * @param event  - DragEvent from the browser
+   * @param status - Status being dragged
    */
   onStatusDragStart(event: DragEvent, status: ProjectStatus): void {
     this.draggingStatusId = status.id;
-    // Simpan snapshot urutan sebelum drag (untuk rollback jika API gagal)
+    // Save a snapshot before dragging (used for rollback if the API fails)
     this._statusOrderBeforeDrag = [...this.projectStatuses];
     if (event.dataTransfer) {
       event.dataTransfer.effectAllowed = 'move';
@@ -346,11 +347,11 @@ export class ProjectDetailComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Dipanggil saat item yang di-drag melewati item list lain.
-   * Melakukan optimistic reorder langsung di UI.
+   * Called when the dragged item passes over another list item.
+   * Performs an optimistic reorder in the local array.
    *
    * @param event  - DragEvent
-   * @param target - Status yang sedang di-hover (calon posisi baru)
+   * @param target - Status currently being hovered (potential new position)
    */
   onStatusDragOver(event: DragEvent, target: ProjectStatus): void {
     event.preventDefault();
@@ -358,13 +359,13 @@ export class ProjectDetailComponent implements OnInit, OnDestroy {
 
     this.dragOverStatusId = target.id;
 
-    // Optimistic update: pindahkan item di array lokal
+    // Optimistic update: move item in the local array
     const fromIndex = this.projectStatuses.findIndex(s => s.id === this.draggingStatusId);
     const toIndex = this.projectStatuses.findIndex(s => s.id === target.id);
 
     if (fromIndex === -1 || toIndex === -1) return;
 
-    // Pindahkan elemen tanpa mutasi langsung
+    // Move element without mutating directly
     const reordered = [...this.projectStatuses];
     const [moved] = reordered.splice(fromIndex, 1);
     reordered.splice(toIndex, 0, moved);
@@ -372,8 +373,8 @@ export class ProjectDetailComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Dipanggil saat item di-drop.
-   * Memicu persistStatusReorder() untuk simpan urutan baru ke API.
+   * Called when a status is dropped.
+   * Triggers persistStatusReorder() to save the new order via the API.
    */
   onStatusDrop(event: DragEvent): void {
     event.preventDefault();
@@ -381,8 +382,8 @@ export class ProjectDetailComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Dipanggil saat drag selesai (baik berhasil atau dibatalkan).
-   * Bersihkan state drag.
+   * Called when the drag ends (dropped or cancelled).
+   * Clears drag state.
    */
   onStatusDragEnd(): void {
     this.draggingStatusId = null;
@@ -390,8 +391,8 @@ export class ProjectDetailComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Simpan urutan status saat ini ke backend via PUT /projects/:id/statuses/reorder.
-   * Jika API gagal, rollback ke urutan sebelum drag.
+   * Persist the current status order to the backend.
+   * Rollback to the pre-drag order if the API call fails.
    */
   private persistStatusReorder(): void {
     const order = this.projectStatuses.map(s => s.id);
@@ -401,11 +402,11 @@ export class ProjectDetailComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (res) => {
           if (res.status === 'success') {
-            // Update dengan data dari server (positions resmi)
+            // Update with server-confirmed positions
             this.projectStatuses = res.data.statuses;
             Swal.fire({
               icon: 'success',
-              text: 'Urutan status diperbarui.',
+              text: 'Status order updated.',
               toast: true,
               position: 'top-end',
               timer: 1500,
@@ -414,15 +415,15 @@ export class ProjectDetailComponent implements OnInit, OnDestroy {
           }
         },
         error: (err) => {
-          // Rollback ke urutan sebelum drag
+          // Rollback to the order before drag
           this.projectStatuses = [...this._statusOrderBeforeDrag];
-          Swal.fire({ icon: 'error', title: 'Gagal', text: err.error?.message || 'Urutan tidak bisa disimpan.', confirmButtonColor: '#6366f1' });
+          Swal.fire({ icon: 'error', title: 'Error', text: err.error?.message || 'Failed to save order.', confirmButtonColor: '#6366f1' });
         }
       });
   }
 
   /**
-   * Load detail project dari API
+   * Load project details from the API.
    */
   loadProject(): void {
     this.projectService.getProject(this.projectId)
@@ -437,14 +438,14 @@ export class ProjectDetailComponent implements OnInit, OnDestroy {
         },
         error: (err) => {
           this.isLoadingProject = false;
-          Swal.fire({ icon: 'error', title: 'Error', text: err.error?.message || 'Gagal memuat project.', confirmButtonColor: '#6366f1' });
+          Swal.fire({ icon: 'error', title: 'Error', text: err.error?.message || 'Failed to load project.', confirmButtonColor: '#6366f1' });
         }
       });
   }
 
   /**
-   * Load semua user aktif dari API — digunakan untuk dropdown "Assign To"
-   * Berbeda dari this.members yang hanya berisi member project ini.
+   * Load all active users from the API — used to populate the "Assign To" dropdown.
+   * Distinct from this.members which only contains project members.
    */
   loadAllUsers(): void {
     this.userService.getUsers()
@@ -474,26 +475,26 @@ export class ProjectDetailComponent implements OnInit, OnDestroy {
         },
         error: (err) => {
           this.isLoadingTasks = false;
-          Swal.fire({ icon: 'error', title: 'Error', text: err.error?.message || 'Gagal memuat tasks.', confirmButtonColor: '#6366f1' });
+          Swal.fire({ icon: 'error', title: 'Error', text: err.error?.message || 'Failed to load tasks.', confirmButtonColor: '#6366f1' });
         }
       });
   }
 
   /**
-   * Ubah status task secara inline (dropdown di table view)
-   * atau dipanggil dari drag & drop di kanban view.
+   * Update a task's status — called from the inline dropdown (table view)
+   * or from drag & drop (kanban view).
    *
-   * @param task - Task yang diubah statusnya
-   * @param newStatus - Status baru
-   * @param oldStatus - Status lama (opsional, untuk rollback jika gagal saat drag-drop)
+   * @param task      - Task whose status is being changed
+   * @param newStatus - New status slug
+   * @param oldStatus - Previous status (optional, used for rollback on drag-drop failure)
    */
   onStatusChange(task: Task, newStatus: string, oldStatus?: string): void {
-    // Optimistic update: ubah status di UI dulu
+    // Optimistic update: change UI immediately
     if (!oldStatus) {
       task.status = newStatus;
     }
 
-    // Kirim ke API — gunakan slug apa adanya (support custom status)
+    // Call API — pass slug as-is (supports custom statuses)
     this.taskService.updateTaskStatus(task.id, newStatus)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
@@ -502,25 +503,25 @@ export class ProjectDetailComponent implements OnInit, OnDestroy {
             const statusName = this.getStatusName(newStatus);
             Swal.fire({
               icon: 'success',
-              text: `Status diubah ke "${statusName}"`,
+              text: `Status changed to "${statusName}"`,
               toast: true,
               position: 'top-end',
               timer: 2000,
               showConfirmButton: false,
             });
-            this.loadStatuses(); // Refresh task_count di setiap status
+            this.loadStatuses(); // Refresh task_count per status column
           }
         },
         error: (err) => {
-          // Rollback status ke status lama jika API gagal
+          // Rollback to the original status if the API call failed
           task.status = oldStatus ?? newStatus;
-          Swal.fire({ icon: 'error', title: 'Gagal update status', text: err.error?.message || 'Terjadi kesalahan.', confirmButtonColor: '#6366f1' });
+          Swal.fire({ icon: 'error', title: 'Failed to update status', text: err.error?.message || 'An error occurred.', confirmButtonColor: '#6366f1' });
         }
       });
   }
 
   /**
-   * Submit form buat task baru
+   * Submit the create-task form.
    */
   onCreateTask(): void {
     if (this.taskForm.invalid) {
@@ -531,7 +532,7 @@ export class ProjectDetailComponent implements OnInit, OnDestroy {
     this.isSubmittingTask = true;
     const v = this.taskForm.value;
 
-    // Ambil slug status pertama sebagai default jika form belum diisi
+    // Use first project status slug as default if the form field is empty
     const defaultStatus = this.projectStatuses.length > 0 ? this.projectStatuses[0].slug : 'todo';
 
     this.taskService.createTask({
@@ -548,33 +549,33 @@ export class ProjectDetailComponent implements OnInit, OnDestroy {
           this.isSubmittingTask = false;
           if (res.status === 'success') {
             this.showCreateTaskModal = false;
-            // Reset form dengan status default dari project statuses
+            // Reset form keeping the default status from project statuses
             this.taskForm.reset({ priority: 'medium', status: defaultStatus });
-            Swal.fire({ icon: 'success', title: 'Task dibuat!', toast: true, position: 'top-end', timer: 2000, showConfirmButton: false });
+            Swal.fire({ icon: 'success', title: 'Task created!', toast: true, position: 'top-end', timer: 2000, showConfirmButton: false });
             this.loadTasks();
-            this.loadStatuses(); // Update task_count di kolom status
+            this.loadStatuses(); // Update task_count per status column
           }
         },
         error: (err) => {
           this.isSubmittingTask = false;
-          Swal.fire({ icon: 'error', title: 'Gagal membuat task', text: err.error?.message || 'Terjadi kesalahan.', confirmButtonColor: '#6366f1' });
+          Swal.fire({ icon: 'error', title: 'Failed to create task', text: err.error?.message || 'An error occurred.', confirmButtonColor: '#6366f1' });
         }
       });
   }
 
   /**
-   * Konfirmasi dan hapus task via SweetAlert2
+   * Show a SweetAlert2 confirmation dialog, then soft-delete the task.
    */
   async onDeleteTask(task: Task): Promise<void> {
     const result = await Swal.fire({
-      title: 'Hapus Task?',
-      html: `Hapus task <strong>"${task.title}"</strong>?`,
+      title: 'Delete Task?',
+      html: `Delete task <strong>"${task.title}"</strong>?`,
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#ef4444',
       cancelButtonColor: '#6b7280',
-      confirmButtonText: 'Hapus',
-      cancelButtonText: 'Batal'
+      confirmButtonText: 'Delete',
+      cancelButtonText: 'Cancel'
     });
 
     if (!result.isConfirmed) return;
@@ -582,16 +583,16 @@ export class ProjectDetailComponent implements OnInit, OnDestroy {
     this.taskService.deleteTask(task.id).subscribe({
       next: () => {
         this.tasks = this.tasks.filter(t => t.id !== task.id);
-        Swal.fire({ icon: 'success', text: 'Task dihapus.', toast: true, position: 'top-end', timer: 2000, showConfirmButton: false });
+        Swal.fire({ icon: 'success', text: 'Task deleted.', toast: true, position: 'top-end', timer: 2000, showConfirmButton: false });
       },
       error: (err) => {
-        Swal.fire({ icon: 'error', title: 'Gagal hapus task', text: err.error?.message || 'Terjadi kesalahan.', confirmButtonColor: '#6366f1' });
+        Swal.fire({ icon: 'error', title: 'Failed to delete task', text: err.error?.message || 'An error occurred.', confirmButtonColor: '#6366f1' });
       }
     });
   }
 
   /**
-   * Filter tasks by status dan reload
+   * Apply the task status filter and reload the task list.
    */
   applyTaskFilter(): void {
     this.loadTasks();

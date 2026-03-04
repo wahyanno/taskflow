@@ -6,40 +6,40 @@ import { environment } from '../../../environments/environment';
 import { ApiResponse, AuthResponse, User } from '../models/models';
 
 /**
- * AuthService - Mengelola autentikasi user
+ * AuthService — manages user authentication state
  *
- * Bertanggung jawab untuk:
+ * Responsibilities:
  * - Login & Register via API
- * - Menyimpan JWT token ke localStorage
- * - Menyediakan informasi user yang sedang login (currentUser$)
- * - Logout (hapus token dari storage)
- * - Guard check apakah user sudah login
+ * - Persist JWT token in localStorage
+ * - Expose the currently authenticated user via currentUser$ observable
+ * - Logout (clear token and redirect)
+ * - Guard check to verify if the user is logged in
  *
- * Token disimpan di localStorage dengan key 'taskflow_token'.
+ * Token is stored in localStorage under the key 'taskflow_token'.
  */
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  /** Key untuk menyimpan JWT token di localStorage */
+  /** localStorage keys */
   private readonly TOKEN_KEY = 'taskflow_token';
   private readonly USER_KEY = 'taskflow_user';
 
-  /** BehaviorSubject untuk state user yang sedang login */
+  /** BehaviorSubject for the currently authenticated user state */
   private currentUserSubject = new BehaviorSubject<User | null>(this.getUserFromStorage());
   public currentUser$ = this.currentUserSubject.asObservable();
 
   constructor(
     private http: HttpClient,
     private router: Router
-  ) {}
+  ) { }
 
   /**
-   * Login user dengan email dan password
+   * Login with email and password.
    *
-   * Input: { email, password }
-   * Output: Observable<ApiResponse<AuthResponse>>
-   * Side effect: simpan token & user ke localStorage
+   * Input  : { email, password }
+   * Output : Observable<ApiResponse<AuthResponse>>
+   * Side effect: saves token & user to localStorage
    */
   login(email: string, password: string): Observable<ApiResponse<AuthResponse>> {
     return this.http.post<ApiResponse<AuthResponse>>(
@@ -48,7 +48,6 @@ export class AuthService {
     ).pipe(
       tap(response => {
         if (response.status === 'success' && response.data) {
-          // Simpan token dan data user ke localStorage
           localStorage.setItem(this.TOKEN_KEY, response.data.token);
           localStorage.setItem(this.USER_KEY, JSON.stringify(response.data.user));
           this.currentUserSubject.next(response.data.user);
@@ -58,10 +57,10 @@ export class AuthService {
   }
 
   /**
-   * Register user baru
+   * Register a new user.
    *
-   * Input: { name, email, password }
-   * Output: Observable<ApiResponse>
+   * Input  : { name, email, password }
+   * Output : Observable<ApiResponse>
    */
   register(name: string, email: string, password: string): Observable<ApiResponse<any>> {
     return this.http.post<ApiResponse<any>>(
@@ -71,7 +70,7 @@ export class AuthService {
   }
 
   /**
-   * Logout: hapus token dan redirect ke login
+   * Logout: clear stored credentials and redirect to login.
    */
   logout(): void {
     localStorage.removeItem(this.TOKEN_KEY);
@@ -81,16 +80,16 @@ export class AuthService {
   }
 
   /**
-   * Ambil JWT token dari localStorage
+   * Retrieve the JWT token from localStorage.
    *
-   * @returns string | null - Token atau null jika belum login
+   * @returns string | null — token, or null if not logged in
    */
   getToken(): string | null {
     return localStorage.getItem(this.TOKEN_KEY);
   }
 
   /**
-   * Cek apakah user sudah login (token ada di localStorage)
+   * Check whether the user is currently logged in (token exists).
    *
    * @returns boolean
    */
@@ -99,7 +98,7 @@ export class AuthService {
   }
 
   /**
-   * Ambil user yang sedang login (dari state BehaviorSubject)
+   * Get the currently authenticated user from the BehaviorSubject.
    *
    * @returns User | null
    */
@@ -108,9 +107,9 @@ export class AuthService {
   }
 
   /**
-   * Cek role user yang sedang login
+   * Check if the current user has a specific role.
    *
-   * @param role - Role yang ingin dicek
+   * @param role - Role to check against
    * @returns boolean
    */
   hasRole(role: 'admin' | 'manager' | 'member'): boolean {
@@ -119,8 +118,8 @@ export class AuthService {
   }
 
   /**
-   * Helper: ambil user dari localStorage saat service diinisialisasi
-   * (untuk persist login state setelah refresh)
+   * Load user from localStorage on service initialization.
+   * Used to restore login state after a page refresh.
    */
   private getUserFromStorage(): User | null {
     try {

@@ -1,36 +1,39 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { ApiResponse, PaginatedResponse, Project } from '../models/models';
+import { ApiResponse, PaginatedResponse, Project, ProjectActivityLog } from '../models/models';
 
 /**
- * ProjectService - Semua API call untuk manajemen project
+ * ProjectService — API calls for project management
  *
- * Menyediakan method untuk:
- * - Ambil list project (dengan pagination dan filter)
- * - Ambil detail project
- * - Buat project baru
- * - Update project
- * - Hapus project
- * - Kelola anggota project
+ * Provides methods for:
+ * - Listing projects (with pagination and filters)
+ * - Fetching a single project's details
+ * - Creating, updating, and deleting projects
+ * - Managing project members
+ * - Retrieving the project activity log
  *
- * Semua request otomatis ter-inject JWT token via JwtInterceptor.
+ * All requests are automatically injected with the JWT token via JwtInterceptor.
  */
 @Injectable({
   providedIn: 'root'
 })
 export class ProjectService {
-  private readonly baseUrl = `${environment.apiUrl}/projects`;
+  private readonly baseUrl = `${environment.apiUrl}/project`;
 
   constructor(private http: HttpClient) { }
 
   /**
    * POST /project/index
-   * Ambil list semua project dengan pagination dan filter opsional
+   * Retrieve a paginated list of projects with optional filters.
+   *
+   * @param page    - Page number (default 1)
+   * @param perPage - Items per page (default 10)
+   * @param status  - Optional status filter (active / completed)
    */
   getProjects(page = 1, perPage = 10, status?: string): Observable<ApiResponse<PaginatedResponse<Project>>> {
-    return this.http.post<ApiResponse<PaginatedResponse<Project>>>(`${environment.apiUrl}/project/index`, {
+    return this.http.post<ApiResponse<PaginatedResponse<Project>>>(`${this.baseUrl}/index`, {
       page,
       per_page: perPage,
       status
@@ -38,46 +41,58 @@ export class ProjectService {
   }
 
   /**
-   * POST /projects/view
-   * Ambil detail sebuah project beserta daftar member dan statistik task
+   * POST /project/view
+   * Fetch a single project including members list and task statistics.
+   *
+   * @param id - Project ID
    */
   getProject(id: number): Observable<ApiResponse<{ project: Project; members: any[]; task_counts: any }>> {
-    return this.http.post<ApiResponse<any>>(`${environment.apiUrl}/project/view`, { id });
+    return this.http.post<ApiResponse<any>>(`${this.baseUrl}/view`, { id });
   }
 
   /**
-   * POST /projects/create
-   * Buat project baru (Manager/Admin only)
+   * POST /project/create
+   * Create a new project. Admin / Manager only.
+   *
+   * @param data - Project fields: name, description (optional), deadline (optional)
    */
   createProject(data: { name: string; description?: string; deadline?: string }): Observable<ApiResponse<{ project: Project }>> {
-    return this.http.post<ApiResponse<{ project: Project }>>(`${environment.apiUrl}/project/create`, data);
+    return this.http.post<ApiResponse<{ project: Project }>>(`${this.baseUrl}/create`, data);
   }
 
   /**
    * POST /project/update
-   * Update data project
+   * Update an existing project.
+   *
+   * @param id   - Project ID
+   * @param data - Fields to update (partial Project object)
    */
   updateProject(id: number, data: Partial<Project>): Observable<ApiResponse<{ project: Project }>> {
-    return this.http.post<ApiResponse<{ project: Project }>>(`${environment.apiUrl}/project/update`, {
+    return this.http.post<ApiResponse<{ project: Project }>>(`${this.baseUrl}/update`, {
       id,
       ...data
     });
   }
 
   /**
-   * POST /projects/delete
-   * Hapus project (Admin only)
+   * POST /project/delete
+   * Soft-delete a project. Admin only.
+   *
+   * @param id - Project ID
    */
   deleteProject(id: number): Observable<ApiResponse<null>> {
-    return this.http.post<ApiResponse<null>>(`${environment.apiUrl}/project/delete`, { id });
+    return this.http.post<ApiResponse<null>>(`${this.baseUrl}/delete`, { id });
   }
 
   /**
    * POST /project/add-member
-   * Tambah user sebagai anggota project
+   * Add a user as a project member. Admin / Manager only.
+   *
+   * @param projectId - Project ID
+   * @param userId    - User ID to add
    */
   addMember(projectId: number, userId: number): Observable<ApiResponse<any>> {
-    return this.http.post<ApiResponse<any>>(`${environment.apiUrl}/project/add-member`, {
+    return this.http.post<ApiResponse<any>>(`${this.baseUrl}/add-member`, {
       project_id: projectId,
       user_id: userId
     });
@@ -85,12 +100,28 @@ export class ProjectService {
 
   /**
    * POST /project/remove-member
-   * Hapus user dari anggota project
+   * Remove a user from a project. Admin / Manager only.
+   *
+   * @param projectId - Project ID
+   * @param userId    - User ID to remove
    */
   removeMember(projectId: number, userId: number): Observable<ApiResponse<null>> {
-    return this.http.post<ApiResponse<null>>(`${environment.apiUrl}/project/remove-member`, {
+    return this.http.post<ApiResponse<null>>(`${this.baseUrl}/remove-member`, {
       project_id: projectId,
       user_id: userId
+    });
+  }
+
+  /**
+   * POST /project/logs
+   * Retrieve the project activity log (audit trail of changes).
+   *
+   * @param projectId - Project ID
+   * @returns Observable containing a list of ProjectActivityLog entries
+   */
+  getProjectLogs(projectId: number): Observable<ApiResponse<{ logs: ProjectActivityLog[] }>> {
+    return this.http.post<ApiResponse<{ logs: ProjectActivityLog[] }>>(`${this.baseUrl}/logs`, {
+      id: projectId
     });
   }
 }

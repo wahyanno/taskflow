@@ -8,13 +8,13 @@ import { ProjectService } from '../../../core/services/project.service';
 import { Project } from '../../../core/models/models';
 
 /**
- * ProjectListComponent - Menampilkan daftar semua project
+ * ProjectListComponent — Displays the paginated list of all projects.
  *
  * Features:
- * - List project dengan pagination
- * - Filter by status (active/completed)
- * - Modal inline form untuk buat project baru (Manager/Admin)
- * - Konfirmasi hapus project (Admin only) via SweetAlert2
+ * - Project list with pagination
+ * - Filter by status (active / completed)
+ * - Inline modal form for creating a new project (Manager / Admin)
+ * - Delete confirmation for projects (Admin only) via SweetAlert2
  */
 @Component({
   selector: 'app-project-list',
@@ -35,13 +35,13 @@ export class ProjectListComponent implements OnInit, OnDestroy {
   /** Filter state */
   statusFilter = '';
 
-  /** Subject untuk cancel subscriptions saat component destroyed */
+  /** Subject used to cancel subscriptions on component destroy */
   private destroy$ = new Subject<void>();
 
-  /** Form untuk buat project baru */
+  /** Reactive form for creating a new project */
   projectForm: FormGroup;
 
-  /** Current user info untuk cek role */
+  /** Current user — used for role-based UI rendering */
   currentUser = this.authService.getCurrentUser();
 
   constructor(
@@ -61,7 +61,7 @@ export class ProjectListComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Lifecycle hook: cancel semua subscription saat component destroyed.
+   * Cancel all active subscriptions when the component is destroyed.
    */
   ngOnDestroy(): void {
     this.destroy$.next();
@@ -70,22 +70,18 @@ export class ProjectListComponent implements OnInit, OnDestroy {
 
   get name() { return this.projectForm.get('name')!; }
 
-  /**
-   * Cek apakah user bisa membuat project (Admin/Manager)
-   */
+  /** Check if the current user can create projects (Admin / Manager) */
   get canCreateProject(): boolean {
     return this.currentUser?.role === 'admin' || this.currentUser?.role === 'manager';
   }
 
-  /**
-   * Cek apakah user bisa menghapus project (Admin only)
-   */
+  /** Check if the current user can delete projects (Admin only) */
   get canDeleteProject(): boolean {
     return this.currentUser?.role === 'admin';
   }
 
   /**
-   * Load list project dari API dengan pagination dan filter
+   * Fetch the project list from the API with pagination and filter applied.
    */
   loadProjects(): void {
     this.isLoading = true;
@@ -102,13 +98,13 @@ export class ProjectListComponent implements OnInit, OnDestroy {
         },
         error: (err) => {
           this.isLoading = false;
-          Swal.fire({ icon: 'error', title: 'Error', text: err.error?.message || 'Gagal memuat project.', confirmButtonColor: '#6366f1' });
+          Swal.fire({ icon: 'error', title: 'Error', text: err.error?.message || 'Failed to load projects.', confirmButtonColor: '#6366f1' });
         }
       });
   }
 
   /**
-   * Ubah halaman (pagination)
+   * Navigate to a specific page (pagination).
    */
   goToPage(page: number): void {
     if (page < 1 || page > this.totalPages) return;
@@ -117,7 +113,7 @@ export class ProjectListComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Terapkan filter dan reload
+   * Apply the current filter and reload from page 1.
    */
   applyFilter(): void {
     this.currentPage = 1;
@@ -125,7 +121,7 @@ export class ProjectListComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Submit form buat project baru
+   * Submit the create-project form.
    */
   onCreateProject(): void {
     if (this.projectForm.invalid) {
@@ -147,42 +143,41 @@ export class ProjectListComponent implements OnInit, OnDestroy {
           if (res.status === 'success') {
             this.showCreateModal = false;
             this.projectForm.reset();
-            Swal.fire({ icon: 'success', title: 'Project dibuat!', text: `Project "${res.data.project.name}" berhasil dibuat.`, confirmButtonColor: '#6366f1', timer: 2000, showConfirmButton: false });
+            Swal.fire({ icon: 'success', title: 'Project created!', text: `"${res.data.project.name}" has been created successfully.`, confirmButtonColor: '#6366f1', timer: 2000, showConfirmButton: false });
             this.loadProjects();
           }
         },
         error: (err) => {
           this.isSubmitting = false;
-          Swal.fire({ icon: 'error', title: 'Gagal membuat project', text: err.error?.message || 'Terjadi kesalahan.', confirmButtonColor: '#6366f1' });
+          Swal.fire({ icon: 'error', title: 'Failed to create project', text: err.error?.message || 'An error occurred. Please try again.', confirmButtonColor: '#6366f1' });
         }
       });
   }
 
   /**
-   * Konfirmasi dan hapus project (Admin only)
-   * Menggunakan SweetAlert2 confirmation modal
+   * Show a SweetAlert2 confirmation dialog, then soft-delete the project (Admin only).
    */
   async onDeleteProject(project: Project): Promise<void> {
     const result = await Swal.fire({
-      title: 'Hapus Project?',
-      html: `Anda yakin ingin menghapus project <strong>"${project.name}"</strong>?<br><small>Semua task dalam project ini juga akan terhapus.</small>`,
+      title: 'Delete Project?',
+      html: `Are you sure you want to delete <strong>"${project.name}"</strong>?<br><small>All tasks in this project will also be deleted.</small>`,
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#ef4444',
       cancelButtonColor: '#6b7280',
-      confirmButtonText: 'Ya, Hapus',
-      cancelButtonText: 'Batal'
+      confirmButtonText: 'Yes, Delete',
+      cancelButtonText: 'Cancel'
     });
 
     if (!result.isConfirmed) return;
 
     this.projectService.deleteProject(project.id).subscribe({
       next: () => {
-        Swal.fire({ icon: 'success', title: 'Terhapus!', text: 'Project berhasil dihapus.', confirmButtonColor: '#6366f1', timer: 2000, showConfirmButton: false });
+        Swal.fire({ icon: 'success', title: 'Deleted!', text: 'Project has been deleted successfully.', confirmButtonColor: '#6366f1', timer: 2000, showConfirmButton: false });
         this.loadProjects();
       },
       error: (err) => {
-        Swal.fire({ icon: 'error', title: 'Gagal menghapus', text: err.error?.message || 'Terjadi kesalahan.', confirmButtonColor: '#6366f1' });
+        Swal.fire({ icon: 'error', title: 'Failed to delete', text: err.error?.message || 'An error occurred. Please try again.', confirmButtonColor: '#6366f1' });
       }
     });
   }

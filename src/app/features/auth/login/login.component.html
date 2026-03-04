@@ -1,101 +1,214 @@
 <!-- ==================== LOGIN PAGE ==================== -->
 <div class="auth-page">
-  <div class="auth-card">
+  <div class="auth-layout">
 
-    <!-- Logo & Title -->
-    <div class="auth-card__header">
-      <div class="auth-card__logo">
+    <!-- LEFT: Login Card -->
+    <div class="auth-card">
+
+      <!-- Logo & Title -->
+      <div class="auth-card__header">
+        <div class="auth-card__logo">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 11l3 3L22 4"></path>
+            <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"></path>
+          </svg>
+        </div>
+        <h1 class="auth-card__title">TaskFlow</h1>
+        <p class="auth-card__subtitle">Sign in to your account</p>
+      </div>
+
+      <!-- Login Form -->
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="auth-form" id="form-login" novalidate>
+
+        <!-- Email Field -->
+        <div class="form-group">
+          <label for="input-email">Email</label>
+          <input id="input-email" type="email" formControlName="email" class="form-control"
+            [class.is-invalid]="email.invalid && email.touched" placeholder="you@example.com" autocomplete="email" />
+          <p class="form-error" *ngIf="email.invalid && email.touched">
+            <ng-container *ngIf="email.errors?.['required']">Email is required.</ng-container>
+            <ng-container *ngIf="email.errors?.['email']">Invalid email format.</ng-container>
+          </p>
+        </div>
+
+        <!-- Password Field -->
+        <div class="form-group">
+          <label for="input-password">Password</label>
+          <div class="input-password-wrapper">
+            <input id="input-password" [type]="showPassword ? 'text' : 'password'" formControlName="password"
+              class="form-control" [class.is-invalid]="password.invalid && password.touched" placeholder="••••••••"
+              autocomplete="current-password" />
+            <button type="button" class="password-toggle" (click)="showPassword = !showPassword"
+              id="btn-toggle-password">
+              <svg *ngIf="!showPassword" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+              <svg *ngIf="showPassword" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94"></path>
+                <path d="M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19"></path>
+                <line x1="1" y1="1" x2="23" y2="23"></line>
+              </svg>
+            </button>
+          </div>
+          <p class="form-error" *ngIf="password.invalid && password.touched">
+            <ng-container *ngIf="password.errors?.['required']">Password is required.</ng-container>
+            <ng-container *ngIf="password.errors?.['minlength']">Password must be at least 6 characters.</ng-container>
+          </p>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="btn btn--primary btn--full" id="btn-login-submit" [disabled]="isLoading">
+          <span *ngIf="isLoading" class="btn-spinner"></span>
+          <span>{{ isLoading ? 'Signing in...' : 'Sign In' }}</span>
+        </button>
+
+      </form>
+
+      <!-- Register link -->
+      <p class="auth-card__footer">
+        Don't have an account?
+        <a routerLink="/auth/register" id="link-to-register">Create one now</a>
+      </p>
+
+      <!-- Demo Credentials -->
+      <div class="demo-creds">
+        <p class="demo-creds__title">Demo Credentials</p>
+        <div class="demo-creds__list">
+          <span class="badge badge--admin">Admin</span> admin&#64;taskflow.dev
+          &nbsp;|&nbsp;
+          <span class="badge badge--manager">Manager</span> manager&#64;taskflow.dev
+          &nbsp;|&nbsp;
+          <span class="badge badge--member">Member</span> member&#64;taskflow.dev
+        </div>
+        <p class="demo-creds__pass">Password: <code>password123</code></p>
+      </div>
+
+    </div>
+
+    <!-- RIGHT: Info Panel (Feature highlights + RBAC table) -->
+    <div class="auth-info">
+
+      <div class="auth-info__brand">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M9 11l3 3L22 4"></path>
           <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"></path>
         </svg>
-      </div>
-      <h1 class="auth-card__title">TaskFlow</h1>
-      <p class="auth-card__subtitle">Sign in to your account</p>
-    </div>
-
-    <!-- Login Form -->
-    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="auth-form" id="form-login" novalidate>
-
-      <!-- Email Field -->
-      <div class="form-group">
-        <label for="input-email">Email</label>
-        <input
-          id="input-email"
-          type="email"
-          formControlName="email"
-          class="form-control"
-          [class.is-invalid]="email.invalid && email.touched"
-          placeholder="you@example.com"
-          autocomplete="email"
-        />
-        <p class="form-error" *ngIf="email.invalid && email.touched">
-          <ng-container *ngIf="email.errors?.['required']">Email wajib diisi.</ng-container>
-          <ng-container *ngIf="email.errors?.['email']">Format email tidak valid.</ng-container>
-        </p>
+        <span>TaskFlow</span>
       </div>
 
-      <!-- Password Field -->
-      <div class="form-group">
-        <label for="input-password">Password</label>
-        <div class="input-password-wrapper">
-          <input
-            id="input-password"
-            [type]="showPassword ? 'text' : 'password'"
-            formControlName="password"
-            class="form-control"
-            [class.is-invalid]="password.invalid && password.touched"
-            placeholder="••••••••"
-            autocomplete="current-password"
-          />
-          <button type="button" class="password-toggle" (click)="showPassword = !showPassword" id="btn-toggle-password">
-            <svg *ngIf="!showPassword" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-              <circle cx="12" cy="12" r="3"></circle>
+      <h2 class="auth-info__title">Enterprise-grade Task Management</h2>
+      <p class="auth-info__desc">
+        Manage projects, assign tasks, and track team progress in real time.
+        Built with a role-based access control system for granular permissions.
+      </p>
+
+      <!-- Feature highlights -->
+      <div class="auth-features">
+        <div class="auth-feature">
+          <div class="auth-feature__icon auth-feature__icon--indigo">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="3" y1="9" x2="21" y2="9"></line>
+              <line x1="9" y1="21" x2="9" y2="9"></line>
             </svg>
-            <svg *ngIf="showPassword" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94"></path>
-              <path d="M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19"></path>
-              <line x1="1" y1="1" x2="23" y2="23"></line>
-            </svg>
-          </button>
+          </div>
+          <div>
+            <strong>Kanban Board</strong>
+            <span>Drag &amp; drop tasks between custom statuses</span>
+          </div>
         </div>
-        <p class="form-error" *ngIf="password.invalid && password.touched">
-          <ng-container *ngIf="password.errors?.['required']">Password wajib diisi.</ng-container>
-          <ng-container *ngIf="password.errors?.['minlength']">Password minimal 6 karakter.</ng-container>
+        <div class="auth-feature">
+          <div class="auth-feature__icon auth-feature__icon--emerald">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+            </svg>
+          </div>
+          <div>
+            <strong>Real-time Dashboard</strong>
+            <span>Statistics, completion rates &amp; overdue tracking</span>
+          </div>
+        </div>
+        <div class="auth-feature">
+          <div class="auth-feature__icon auth-feature__icon--amber">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            </svg>
+          </div>
+          <div>
+            <strong>Full Audit Trail</strong>
+            <span>Every project &amp; task change is logged</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ====== ROLE PERMISSION TABLE ====== -->
+      <div class="rbac-section">
+        <p class="rbac-section__title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <path d="M23 21v-2a4 4 0 00-3-3.87"></path>
+            <path d="M16 3.13a4 4 0 010 7.75"></path>
+          </svg>
+          Role-Based Access Control
+        </p>
+
+        <div class="rbac-table-wrapper">
+          <table class="rbac-table" role="table" aria-label="Role permissions matrix">
+            <thead>
+              <tr>
+                <th>Action</th>
+                <th><span class="role-pill role-pill--admin">Admin</span></th>
+                <th><span class="role-pill role-pill--manager">Manager</span></th>
+                <th><span class="role-pill role-pill--member">Member</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Create Project</td>
+                <td><span class="perm perm--yes">✔</span></td>
+                <td><span class="perm perm--yes">✔</span></td>
+                <td><span class="perm perm--no">✖</span></td>
+              </tr>
+              <tr>
+                <td>Assign Task</td>
+                <td><span class="perm perm--yes">✔</span></td>
+                <td><span class="perm perm--yes">✔</span></td>
+                <td><span class="perm perm--partial">Own only</span></td>
+              </tr>
+              <tr>
+                <td>Change Status</td>
+                <td><span class="perm perm--yes">✔</span></td>
+                <td><span class="perm perm--yes">✔</span></td>
+                <td><span class="perm perm--partial">Assigned</span></td>
+              </tr>
+              <tr>
+                <td>Delete Task</td>
+                <td><span class="perm perm--yes">✔</span></td>
+                <td><span class="perm perm--partial">Own tasks</span></td>
+                <td><span class="perm perm--no">✖</span></td>
+              </tr>
+              <tr>
+                <td>Delete Project</td>
+                <td><span class="perm perm--yes">✔</span></td>
+                <td><span class="perm perm--no">✖</span></td>
+                <td><span class="perm perm--no">✖</span></td>
+              </tr>
+              <tr>
+                <td>Manage Members</td>
+                <td><span class="perm perm--yes">✔</span></td>
+                <td><span class="perm perm--yes">✔</span></td>
+                <td><span class="perm perm--no">✖</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="rbac-section__note">
+          <span class="perm perm--partial">Assigned / Own</span> = restricted to tasks or projects the user owns
         </p>
       </div>
 
-      <!-- Submit Button -->
-      <button
-        type="submit"
-        class="btn btn--primary btn--full"
-        id="btn-login-submit"
-        [disabled]="isLoading"
-      >
-        <span *ngIf="isLoading" class="btn-spinner"></span>
-        <span>{{ isLoading ? 'Signing in...' : 'Sign In' }}</span>
-      </button>
-
-    </form>
-
-    <!-- Footer link ke register -->
-    <p class="auth-card__footer">
-      Belum punya akun?
-      <a routerLink="/auth/register" id="link-to-register">Daftar sekarang</a>
-    </p>
-
-    <!-- Demo Credentials -->
-    <div class="demo-creds">
-      <p class="demo-creds__title">Demo Credentials</p>
-      <div class="demo-creds__list">
-        <span class="badge badge--admin">Admin</span> admin&#64;taskflow.dev
-        &nbsp;|&nbsp;
-        <span class="badge badge--manager">Manager</span> manager&#64;taskflow.dev
-        &nbsp;|&nbsp;
-        <span class="badge badge--member">Member</span> member&#64;taskflow.dev
-      </div>
-      <p class="demo-creds__pass">Password: <code>password123</code></p>
     </div>
 
   </div>

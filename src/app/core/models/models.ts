@@ -1,9 +1,9 @@
 /**
- * Interface Models - Representasi data dari API backend
- * Semua interface TypeScript untuk data model TaskFlow
+ * Data Models — TypeScript interfaces for all TaskFlow API responses.
+ * Updated v2: soft delete fields, is_overdue flag, ProjectActivityLog
  */
 
-/** Data User */
+/** Authenticated user data */
 export interface User {
   id: number;
   name: string;
@@ -12,13 +12,13 @@ export interface User {
   status?: string;
 }
 
-/** Data Role */
+/** Role definition */
 export interface Role {
   id: number;
   name: 'admin' | 'manager' | 'member';
 }
 
-/** Data Project */
+/** Project data */
 export interface Project {
   id: number;
   name: string;
@@ -29,6 +29,9 @@ export interface Project {
   creator_name?: string;
   created_at: string;
   updated_at: string;
+  /** Soft delete fields — for internal use, not shown in UI */
+  is_deleted?: boolean;
+  deleted_at?: string | null;
   task_counts?: {
     todo: number;
     in_progress: number;
@@ -36,7 +39,7 @@ export interface Project {
   };
 }
 
-/** Custom status dalam sebuah project */
+/** Custom status for a project (from project_statuses table) */
 export interface ProjectStatus {
   id: number;
   project_id?: number;
@@ -47,7 +50,7 @@ export interface ProjectStatus {
   task_count?: number;
 }
 
-/** Data Task */
+/** Task data */
 export interface Task {
   id: number;
   project_id: number;
@@ -55,7 +58,7 @@ export interface Task {
   description?: string;
   assigned_to?: number;
   assignee_name?: string;
-  /** Status task — slug dari project_statuses (misal: 'todo', 'in_progress', 'done', atau custom) */
+  /** Status slug from project_statuses (e.g. 'todo', 'in_progress', 'done', or custom) */
   status: string;
   priority: 'low' | 'medium' | 'high';
   due_date?: string;
@@ -63,9 +66,17 @@ export interface Task {
   creator_name?: string;
   created_at: string;
   updated_at: string;
+  /**
+   * Overdue flag returned by the server (Business Rule):
+   * TRUE when status != 'done' AND due_date < today
+   */
+  is_overdue?: boolean;
+  /** Soft delete fields */
+  is_deleted?: boolean;
+  deleted_at?: string | null;
 }
 
-/** Task Activity Log */
+/** Task activity log entry */
 export interface TaskActivityLog {
   id: number;
   task_id: number;
@@ -76,7 +87,22 @@ export interface TaskActivityLog {
   created_at: string;
 }
 
-/** Response format standar dari API */
+/**
+ * Project activity log entry — enterprise-grade audit trail for project changes.
+ * Actions: project_created, project_updated, deadline_changed,
+ *          project_status_changed, member_added, member_removed, project_deleted
+ */
+export interface ProjectActivityLog {
+  id: number;
+  project_id: number;
+  action: string;
+  old_value?: string;
+  new_value?: string;
+  changed_by_name: string;
+  created_at: string;
+}
+
+/** Standard API response envelope */
 export interface ApiResponse<T = any> {
   status: 'success' | 'error';
   message: string;

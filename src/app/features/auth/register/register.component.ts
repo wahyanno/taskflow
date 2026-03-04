@@ -5,12 +5,12 @@ import Swal from 'sweetalert2';
 import { AuthService } from '../../../core/services/auth.service';
 
 /**
- * RegisterComponent - Halaman registrasi user baru
+ * RegisterComponent — New user registration page
  *
  * Features:
- * - Reactive form dengan validasi (nama, email, password, konfirmasi password)
- * - Error ditampilkan via SweetAlert2
- * - Sukses tampil toast dan redirect ke login
+ * - Reactive form with validation (name, email, password)
+ * - Errors displayed via SweetAlert2 toast
+ * - On success: shows a success alert and redirects to login
  */
 @Component({
   selector: 'app-register',
@@ -39,13 +39,13 @@ export class RegisterComponent {
   get password() { return this.registerForm.get('password')!; }
 
   /**
-   * Submit form registrasi
+   * Submit the registration form.
    *
    * Flow:
-   * 1. Validasi form
+   * 1. Validate form
    * 2. Call AuthService.register()
-   * 3. Sukses: tampilkan SweetAlert2 success & redirect ke login
-   * 4. Error: tampilkan SweetAlert2 error
+   * 3. Success: show SweetAlert2 success dialog → redirect to login
+   * 4. Error  : show SweetAlert2 error dialog
    */
   async onSubmit(): Promise<void> {
     if (this.registerForm.invalid) {
@@ -60,24 +60,24 @@ export class RegisterComponent {
       this.email.value,
       this.password.value
     ).subscribe({
-      next: (response) => {
+      next: () => {
         this.isLoading = false;
         Swal.fire({
           icon: 'success',
-          title: 'Registrasi Berhasil!',
-          text: 'Akun Anda telah dibuat. Silakan login.',
+          title: 'Registration Successful!',
+          text: 'Your account has been created. Please sign in.',
           confirmButtonColor: '#6366f1',
-          confirmButtonText: 'Login Sekarang'
+          confirmButtonText: 'Go to Login'
         }).then(() => {
           this.router.navigate(['/auth/login']);
         });
       },
       error: (err) => {
         this.isLoading = false;
-        const msg = err.error?.message || 'Registrasi gagal. Silakan coba lagi.';
+        const msg = err.error?.message || 'Registration failed. Please try again.';
         Swal.fire({
           icon: 'error',
-          title: 'Registrasi Gagal',
+          title: 'Registration Failed',
           text: msg,
           confirmButtonColor: '#6366f1',
         });

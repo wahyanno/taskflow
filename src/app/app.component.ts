@@ -6,13 +6,13 @@ import { AuthService } from './core/services/auth.service';
 import { User } from './core/models/models';
 
 /**
- * AppComponent - Root component aplikasi TaskFlow
+ * AppComponent — Root component of the TaskFlow application.
  *
- * Menangani:
- * - Layout utama: sidebar navigation + main content area
- * - State user yang login (ditampilkan di navbar)
- * - Konfirmasi logout menggunakan SweetAlert2
- * - Toggle sidebar untuk mobile responsif
+ * Responsibilities:
+ * - Main layout: sidebar navigation + main content area
+ * - Display the currently logged-in user in the navbar
+ * - Logout confirmation using SweetAlert2
+ * - Toggle sidebar for mobile responsiveness
  */
 @Component({
   selector: 'app-root',
@@ -22,10 +22,10 @@ import { User } from './core/models/models';
 export class AppComponent implements OnInit {
   title = 'TaskFlow';
 
-  /** State user yang sedang login */
+  /** Observable of the currently authenticated user */
   currentUser$: Observable<User | null>;
 
-  /** State sidebar (open/closed untuk mobile) */
+  /** Sidebar open/closed state (for mobile) */
   isSidebarOpen = false;
 
   constructor(
@@ -35,22 +35,22 @@ export class AppComponent implements OnInit {
     this.currentUser$ = this.authService.currentUser$;
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void { }
 
   /**
-   * Konfirmasi logout dengan SweetAlert2 sebelum keluar
-   * Menggunakan modal konfirmasi, bukan browser confirm() bawaan
+   * Show a SweetAlert2 confirmation dialog before logging out.
+   * Uses a modal — does NOT use the browser's built-in confirm().
    */
   async confirmLogout(): Promise<void> {
     const result = await Swal.fire({
       title: 'Logout?',
-      text: 'Anda yakin ingin keluar dari aplikasi?',
+      text: 'Are you sure you want to sign out?',
       icon: 'question',
       showCancelButton: true,
       confirmButtonColor: '#6366f1',
       cancelButtonColor: '#6b7280',
-      confirmButtonText: 'Ya, Logout',
-      cancelButtonText: 'Batal'
+      confirmButtonText: 'Yes, Logout',
+      cancelButtonText: 'Cancel'
     });
 
     if (result.isConfirmed) {
@@ -59,15 +59,15 @@ export class AppComponent implements OnInit {
   }
 
   /**
-   * Toggle sidebar untuk tampilan mobile
+   * Toggle the sidebar for mobile view.
    */
   toggleSidebar(): void {
     this.isSidebarOpen = !this.isSidebarOpen;
   }
 
   /**
-   * Cek apakah user sedang di halaman auth (login/register)
-   * Jika ya, tidak tampilkan sidebar/navbar
+   * Check if the user is on an auth page (login / register).
+   * When true, the sidebar and navbar are hidden.
    */
   get isAuthPage(): boolean {
     return this.router.url.startsWith('/auth');

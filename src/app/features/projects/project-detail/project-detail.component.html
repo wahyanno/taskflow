@@ -22,7 +22,7 @@
       <p class="page-header__subtitle" *ngIf="project.description">{{ project.description }}</p>
     </div>
     <div class="flex gap-sm">
-      <!-- Tombol Manage Statuses — hanya admin/manager -->
+      <!-- Manage Statuses button — admin/manager only -->
       <button *ngIf="canManageTasks" class="btn btn--ghost" id="btn-manage-statuses"
         (click)="showStatusModal = true; editingStatus = null; statusFormName = ''; statusFormColor = 'gray'">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -89,7 +89,7 @@
 
   <!-- Loading tasks -->
   <div *ngIf="isLoadingTasks" class="loading-spinner">
-    <div class="spinner"></div><span>Memuat tasks...</span>
+    <div class="spinner"></div><span>Loading tasks...</span>
   </div>
 
   <!-- Empty tasks -->
@@ -98,8 +98,8 @@
       <path d="M9 11l3 3L22 4"></path>
       <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"></path>
     </svg>
-    <h3>Belum ada task</h3>
-    <p>Tambahkan task pertama ke project ini.</p>
+    <h3>No tasks yet</h3>
+    <p>Add your first task to this project.</p>
     <button *ngIf="canManageTasks" class="btn btn--primary" (click)="showCreateTaskModal = true">Add Task</button>
   </div>
 
@@ -156,7 +156,7 @@
   <div class="kanban-board" *ngIf="!isLoadingTasks && tasks.length > 0 && viewMode === 'kanban'
     || (!isLoadingTasks && viewMode === 'kanban' && projectStatuses.length > 0)">
 
-    <!-- Satu kolom per status dari projectStatuses -->
+    <!-- One column per status from projectStatuses -->
     <div *ngFor="let status of projectStatuses" class="kanban-col" [id]="'kanban-col-' + status.slug"
       [class.drag-over]="dragOverColumn === status.slug" (dragover)="onDragOver($event, status.slug)"
       (dragleave)="onDragLeave(status.slug)" (drop)="onDrop($event, status.slug)">
@@ -200,7 +200,7 @@
             </span>
           </div>
 
-          <!-- Dropdown status pakai projectStatuses -->
+          <!-- Status dropdown using projectStatuses -->
           <select class="status-select status-select--{{ task.status }} kanban-card__status" [value]="task.status"
             (change)="onStatusChange(task, $any($event.target).value)">
             <option *ngFor="let s of projectStatuses" [value]="s.slug">{{ s.name }}</option>
@@ -219,7 +219,7 @@
 
 <!-- Loading project -->
 <div *ngIf="isLoadingProject" class="loading-spinner" style="margin-top: 80px">
-  <div class="spinner"></div><span>Memuat project...</span>
+  <div class="spinner"></div><span>Loading project...</span>
 </div>
 
 <!-- ==================== MANAGE STATUSES MODAL ==================== -->
@@ -240,7 +240,7 @@
           <line x1="3" y1="9" x2="21" y2="9"></line>
           <line x1="3" y1="15" x2="21" y2="15"></line>
         </svg>
-        Geser untuk mengubah urutan
+        Drag to reorder
       </p>
 
       <div *ngFor="let s of projectStatuses" class="status-item" [id]="'status-item-' + s.id" draggable="true"
@@ -250,7 +250,7 @@
         (drop)="onStatusDrop($event)" (dragend)="onStatusDragEnd()">
 
         <!-- Drag handle -->
-        <span class="status-item__handle" title="Drag untuk ubah urutan">
+        <span class="status-item__handle" title="Drag to reorder">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
             <line x1="8" y1="6" x2="16" y2="6"></line>
             <line x1="8" y1="12" x2="16" y2="12"></line>
@@ -286,25 +286,25 @@
       </div>
 
       <div *ngIf="projectStatuses.length === 0 && !isLoadingStatuses" class="text-muted text-sm" style="padding: 12px;">
-        Belum ada status.
+        No statuses yet.
       </div>
     </div>
 
     <!-- Divider -->
     <hr style="margin: 16px 0; border-color: var(--color-border)">
 
-    <!-- Form Tambah / Edit Status -->
+    <!-- Add / Edit Status Form -->
     <h4 class="form-section-title">
-      {{ editingStatus ? 'Edit Status: ' + editingStatus.name : 'Tambah Status Baru' }}
+      {{ editingStatus ? 'Edit Status: ' + editingStatus.name : 'Add New Status' }}
     </h4>
     <div class="status-form">
       <div class="form-group" style="flex: 1">
-        <label for="input-status-name">Nama Status</label>
+        <label for="input-status-name">Status Name</label>
         <input id="input-status-name" type="text" class="form-control" [(ngModel)]="statusFormName"
-          placeholder="Contoh: Review, Testing..." />
+          placeholder="e.g. Review, Testing..." />
       </div>
       <div class="form-group" style="min-width: 130px">
-        <label for="select-status-color">Warna</label>
+        <label for="select-status-color">Color</label>
         <select id="select-status-color" class="form-control" [(ngModel)]="statusFormColor">
           <option value="gray">⬜ Gray</option>
           <option value="blue">🔵 Blue</option>
@@ -325,7 +325,7 @@
     <button type="button" class="btn btn--primary" id="btn-submit-status" (click)="onSaveStatus()"
       [disabled]="isSubmittingStatus">
       <span *ngIf="isSubmittingStatus" class="btn-spinner"></span>
-      {{ editingStatus ? 'Update Status' : 'Tambah Status' }}
+      {{ editingStatus ? 'Update Status' : 'Add Status' }}
     </button>
   </div>
 </div>
@@ -346,16 +346,17 @@
         <label for="input-task-title">Task Title *</label>
         <input id="input-task-title" type="text" formControlName="title" class="form-control"
           [class.is-invalid]="taskForm.get('title')!.invalid && taskForm.get('title')!.touched"
-          placeholder="Nama task..." />
+          placeholder="Task title..." />
         <p class="form-error" *ngIf="taskForm.get('title')!.invalid && taskForm.get('title')!.touched">
-          Title task wajib diisi (min 3 karakter).
+          Task title is required (min 3 characters).
         </p>
       </div>
 
       <div class="form-group">
         <label for="input-task-desc">Description</label>
         <textarea id="input-task-desc" formControlName="description" class="form-control" rows="2"
-          placeholder="Detail task..."></textarea>
+          placeholder="Task details...">
+        </textarea>
       </div>
 
       <div class="modal__two-col">
@@ -375,7 +376,7 @@
 
       <div class="modal__two-col">
         <div class="form-group">
-          <label for="select-task-status">Status Awal</label>
+          <label for="select-task-status">Initial Status</label>
           <select id="select-task-status" formControlName="status" class="form-control">
             <option *ngFor="let s of projectStatuses" [value]="s.slug">{{ s.name }}</option>
           </select>
@@ -383,7 +384,7 @@
         <div class="form-group">
           <label for="select-task-assignee">Assign To</label>
           <select id="select-task-assignee" formControlName="assigned_to" class="form-control">
-            <option value="">-- Pilih User --</option>
+            <option value="">-- Select User --</option>
             <option *ngFor="let u of allUsers" [value]="u.id">{{ u.name }}</option>
           </select>
         </div>
@@ -391,7 +392,7 @@
 
     </div>
     <div class="modal__footer">
-      <button type="button" class="btn btn--ghost" (click)="showCreateTaskModal = false">Batal</button>
+      <button type="button" class="btn btn--ghost" (click)="showCreateTaskModal = false">Cancel</button>
       <button type="submit" class="btn btn--primary" id="btn-submit-task" [disabled]="isSubmittingTask">
         <span *ngIf="isSubmittingTask" class="btn-spinner"></span>
         {{ isSubmittingTask ? 'Adding...' : 'Add Task' }}

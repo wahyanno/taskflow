@@ -3,13 +3,13 @@ import { CanActivate, Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 
 /**
- * AuthGuard - Melindungi route yang memerlukan autentikasi
+ * AuthGuard — Protects routes that require authentication.
  *
- * Route mana pun yang menggunakan canActivate: [AuthGuard]
- * akan otomatis diperiksa apakah user sudah login.
+ * Any route using `canActivate: [AuthGuard]` will be checked
+ * to ensure the user is logged in before granting access.
  *
- * Jika belum login: redirect ke /auth/login
- * Jika sudah login: izinkan akses ke route tersebut
+ * - Not logged in : redirect to /auth/login
+ * - Logged in     : allow navigation to the requested route
  */
 @Injectable({
   providedIn: 'root'
@@ -19,19 +19,19 @@ export class AuthGuard implements CanActivate {
   constructor(
     private authService: AuthService,
     private router: Router
-  ) {}
+  ) { }
 
   /**
-   * Cek apakah user boleh mengakses route
+   * Check whether the user is allowed to access the route.
    *
-   * @returns boolean | UrlTree
+   * @returns boolean — true if authenticated, false (+ redirect) if not
    */
   canActivate(): boolean {
     if (this.authService.isLoggedIn()) {
       return true;
     }
 
-    // Redirect ke halaman login jika belum login
+    // Redirect to login page if the user is not authenticated
     this.router.navigate(['/auth/login']);
     return false;
   }

@@ -1,14 +1,16 @@
-<!-- Dashboard Page -->
+<!-- ==================== DASHBOARD PAGE ==================== -->
 <div class="dashboard-page">
 
   <!-- Page Header -->
   <div class="page-header">
     <div>
       <h2 class="page-header__title">Dashboard</h2>
-      <p class="page-header__subtitle">Overview of your projects and tasks</p>
+      <p class="page-header__subtitle">{{ greeting }}, <strong>{{ currentUser?.name }}</strong> &mdash;
+        <span class="role-badge role-badge--{{ currentUser?.role }}">{{ currentUser?.role }}</span>
+      </p>
     </div>
-    <button class="btn btn--ghost btn--sm" (click)="loadDashboard()" id="btn-refresh-dashboard">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <button class="btn btn--ghost btn--sm" (click)="loadDashboard()" id="btn-refresh-dashboard" [disabled]="isLoading">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" [class.spin]="isLoading">
         <path d="M23 4v6h-6"></path>
         <path d="M1 20v-6h6"></path>
         <path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"></path>
@@ -20,106 +22,250 @@
   <!-- Loading state -->
   <div *ngIf="isLoading" class="loading-spinner">
     <div class="spinner"></div>
-    <span>Memuat dashboard...</span>
+    <span>Loading dashboard...</span>
   </div>
 
   <!-- Dashboard Content -->
   <ng-container *ngIf="!isLoading && dashboardData">
 
-    <!-- ======= STATS GRID ======= -->
-    <div class="stats-grid">
-      <div class="stat-card stat-card--primary">
-        <p class="stat-card__label">Total Projects</p>
-        <p class="stat-card__value">{{ dashboardData.total_projects }}</p>
-        <p class="stat-card__sub">Active projects</p>
+    <!-- ======= KPI STATS GRID ======= -->
+    <div class="kpi-grid">
+
+      <!-- Total Projects -->
+      <div class="kpi-card kpi-card--indigo">
+        <div class="kpi-card__icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+            <line x1="8" y1="21" x2="16" y2="21"></line>
+            <line x1="12" y1="17" x2="12" y2="21"></line>
+          </svg>
+        </div>
+        <div class="kpi-card__content">
+          <span class="kpi-card__label">Active Projects</span>
+          <span class="kpi-card__value">{{ dashboardData.total_projects }}</span>
+          <span class="kpi-card__trend">
+            <span class="dot dot--success"></span> Active
+          </span>
+        </div>
       </div>
 
-      <div class="stat-card stat-card--primary">
-        <p class="stat-card__label">Total Tasks</p>
-        <p class="stat-card__value">{{ dashboardData.total_tasks }}</p>
-        <p class="stat-card__sub">All tasks</p>
+      <!-- Total Tasks -->
+      <div class="kpi-card kpi-card--blue">
+        <div class="kpi-card__icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 11l3 3L22 4"></path>
+            <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"></path>
+          </svg>
+        </div>
+        <div class="kpi-card__content">
+          <span class="kpi-card__label">Total Tasks</span>
+          <span class="kpi-card__value">{{ dashboardData.total_tasks }}</span>
+          <span class="kpi-card__trend">
+            <span class="dot dot--info"></span>
+            {{ dashboardData.completed_tasks }} completed
+          </span>
+        </div>
       </div>
 
-      <div class="stat-card stat-card--success">
-        <p class="stat-card__label">Completion Rate</p>
-        <p class="stat-card__value">{{ dashboardData.completion_percent }}%</p>
-        <p class="stat-card__sub">{{ dashboardData.completed_tasks }} tasks done</p>
+      <!-- Completion Rate -->
+      <div class="kpi-card kpi-card--emerald">
+        <div class="kpi-card__icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+          </svg>
+        </div>
+        <div class="kpi-card__content">
+          <span class="kpi-card__label">Completion Rate</span>
+          <span class="kpi-card__value">{{ dashboardData.completion_percent }}%</span>
+          <!-- Mini progress bar dalam card -->
+          <div class="kpi-card__mini-bar">
+            <div class="kpi-card__mini-bar-fill" [style.width.%]="dashboardData.completion_percent"></div>
+          </div>
+        </div>
       </div>
 
-      <div class="stat-card stat-card--danger">
-        <p class="stat-card__label">Overdue Tasks</p>
-        <p class="stat-card__value">{{ dashboardData.overdue_tasks }}</p>
-        <p class="stat-card__sub">Past due date</p>
+      <!-- Overdue Tasks -->
+      <div class="kpi-card" [class.kpi-card--red]="dashboardData.overdue_tasks > 0"
+        [class.kpi-card--gray]="dashboardData.overdue_tasks === 0">
+        <div class="kpi-card__icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+        </div>
+        <div class="kpi-card__content">
+          <span class="kpi-card__label">Overdue Tasks</span>
+          <span class="kpi-card__value">{{ dashboardData.overdue_tasks }}</span>
+          <span class="kpi-card__trend" [class.text-danger]="dashboardData.overdue_tasks > 0"
+            [class.text-success]="dashboardData.overdue_tasks === 0">
+            <span class="dot" [class.dot--danger]="dashboardData.overdue_tasks > 0"
+              [class.dot--success]="dashboardData.overdue_tasks === 0"></span>
+            {{ dashboardData.overdue_tasks === 0 ? 'All on track!' : 'Need attention' }}
+          </span>
+        </div>
       </div>
+
     </div>
 
-    <!-- ======= TASK STATUS BREAKDOWN ======= -->
+    <!-- ======= MAIN GRID: Status Breakdown + Recent Projects ======= -->
     <div class="dashboard-grid">
 
-      <div class="card">
+      <!-- LEFT: Task Status Breakdown -->
+      <div class="card dash-card">
         <div class="card__header">
-          <h3 class="card__title">Task by Status</h3>
-        </div>
-        <div class="status-breakdown">
-          <div class="status-breakdown__item">
-            <span class="badge badge--todo">Todo</span>
-            <span class="status-breakdown__count">{{ dashboardData.task_by_status.todo }}</span>
-          </div>
-          <div class="status-breakdown__item">
-            <span class="badge badge--in_progress">In Progress</span>
-            <span class="status-breakdown__count">{{ dashboardData.task_by_status.in_progress }}</span>
-          </div>
-          <div class="status-breakdown__item">
-            <span class="badge badge--done">Done</span>
-            <span class="status-breakdown__count">{{ dashboardData.task_by_status.done }}</span>
+          <div class="card__title-group">
+            <h3 class="card__title">Task Status Overview</h3>
+            <span class="card__subtitle">Distribution across all statuses</span>
           </div>
         </div>
 
-        <!-- Progress bar visual -->
-        <div class="progress-bar-group">
-          <div class="progress-bar">
-            <div class="progress-bar__fill progress-bar__fill--primary"
-              [style.width.%]="dashboardData.total_tasks > 0 ? (dashboardData.task_by_status.todo / dashboardData.total_tasks * 100) : 0">
+        <!-- Donut-like visual using stacked bar -->
+        <div class="stacked-bar" *ngIf="dashboardData.total_tasks > 0">
+          <div class="stacked-bar__segment stacked-bar__segment--todo"
+            [style.width.%]="dashboardData.total_tasks > 0 ? (dashboardData.task_by_status.todo / dashboardData.total_tasks * 100) : 0"
+            title="Todo: {{ dashboardData.task_by_status.todo }}">
+          </div>
+          <div class="stacked-bar__segment stacked-bar__segment--progress"
+            [style.width.%]="dashboardData.total_tasks > 0 ? (dashboardData.task_by_status.in_progress / dashboardData.total_tasks * 100) : 0"
+            title="In Progress: {{ dashboardData.task_by_status.in_progress }}">
+          </div>
+          <div class="stacked-bar__segment stacked-bar__segment--done"
+            [style.width.%]="dashboardData.total_tasks > 0 ? (dashboardData.task_by_status.done / dashboardData.total_tasks * 100) : 0"
+            title="Done: {{ dashboardData.task_by_status.done }}">
+          </div>
+        </div>
+
+        <!-- Status Breakdown Items -->
+        <div class="status-list">
+
+          <div class="status-list__item">
+            <div class="status-list__info">
+              <span class="status-dot status-dot--todo"></span>
+              <span class="status-list__label">Todo</span>
+            </div>
+            <div class="status-list__right">
+              <span class="status-list__count">{{ dashboardData.task_by_status.todo }}</span>
+              <span class="status-list__pct">
+                {{ dashboardData.total_tasks > 0 ? ((dashboardData.task_by_status.todo / dashboardData.total_tasks) *
+                100 | number:'1.0-0') : 0 }}%
+              </span>
             </div>
           </div>
-          <div class="progress-bar">
-            <div class="progress-bar__fill progress-bar__fill--info"
-              [style.width.%]="dashboardData.total_tasks > 0 ? (dashboardData.task_by_status.in_progress / dashboardData.total_tasks * 100) : 0">
+
+          <div class="status-list__item">
+            <div class="status-list__info">
+              <span class="status-dot status-dot--progress"></span>
+              <span class="status-list__label">In Progress</span>
+            </div>
+            <div class="status-list__right">
+              <span class="status-list__count">{{ dashboardData.task_by_status.in_progress }}</span>
+              <span class="status-list__pct">
+                {{ dashboardData.total_tasks > 0 ? ((dashboardData.task_by_status.in_progress /
+                dashboardData.total_tasks) * 100 | number:'1.0-0') : 0 }}%
+              </span>
             </div>
           </div>
-          <div class="progress-bar">
-            <div class="progress-bar__fill progress-bar__fill--success"
-              [style.width.%]="dashboardData.completion_percent">
+
+          <div class="status-list__item">
+            <div class="status-list__info">
+              <span class="status-dot status-dot--done"></span>
+              <span class="status-list__label">Done</span>
             </div>
+            <div class="status-list__right">
+              <span class="status-list__count">{{ dashboardData.task_by_status.done }}</span>
+              <span class="status-list__pct">
+                {{ dashboardData.total_tasks > 0 ? ((dashboardData.task_by_status.done / dashboardData.total_tasks) *
+                100 | number:'1.0-0') : 0 }}%
+              </span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Completion progress -->
+        <div class="completion-summary">
+          <div class="completion-summary__label">
+            <span>Overall Completion</span>
+            <strong>{{ dashboardData.completion_percent }}%</strong>
+          </div>
+          <div class="completion-bar">
+            <div class="completion-bar__fill" [style.width.%]="dashboardData.completion_percent"></div>
           </div>
         </div>
       </div>
 
-      <!-- ======= RECENT PROJECTS ======= -->
-      <div class="card">
+      <!-- RIGHT: Recent Projects -->
+      <div class="card dash-card">
         <div class="card__header">
-          <h3 class="card__title">Recent Projects</h3>
-          <a routerLink="/projects" class="btn btn--ghost btn--sm" id="link-all-projects">View All</a>
+          <div class="card__title-group">
+            <h3 class="card__title">Recent Projects</h3>
+            <span class="card__subtitle">Latest 5 active projects</span>
+          </div>
+          <a routerLink="/projects" class="btn btn--ghost btn--sm" id="link-all-projects">
+            View All
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </a>
         </div>
 
+        <!-- Empty state -->
         <div *ngIf="dashboardData.recent_projects.length === 0" class="empty-state" style="padding: 24px">
-          <p>Belum ada project.</p>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+          </svg>
+          <p>No projects yet.</p>
         </div>
 
-        <div class="recent-projects">
-          <div *ngFor="let project of dashboardData.recent_projects" class="recent-project-item">
-            <div class="recent-project-item__info">
-              <a [routerLink]="['/projects', project.id]" class="recent-project-item__name">
-                {{ project.name }}
-              </a>
-              <span class="text-xs text-muted" *ngIf="project.deadline">
-                Deadline: {{ project.deadline | date:'dd MMM yyyy' }}
-              </span>
+        <div class="project-list" *ngIf="dashboardData.recent_projects.length > 0">
+          <div *ngFor="let project of dashboardData.recent_projects; let i = index" class="project-row">
+
+            <!-- Left: Project info -->
+            <div class="project-row__left">
+              <div class="project-row__avatar" [class]="'project-avatar-' + (i % 5)">
+                {{ project.name.charAt(0).toUpperCase() }}
+              </div>
+              <div class="project-row__info">
+                <a [routerLink]="['/projects', project.id]" class="project-row__name"
+                  [id]="'link-project-' + project.id">
+                  {{ project.name }}
+                </a>
+                <span class="project-row__deadline" *ngIf="project.deadline">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                  </svg>
+                  {{ project.deadline | date:'dd MMM yyyy' }}
+                </span>
+              </div>
             </div>
-            <div class="recent-project-item__stats" *ngIf="project.task_counts">
-              <span class="badge badge--done">{{ project.task_counts.done }} done</span>
-              <span class="badge badge--in_progress">{{ project.task_counts.in_progress }} wip</span>
+
+            <!-- Right: task mini stats -->
+            <div class="project-row__stats" *ngIf="project.task_counts">
+              <div class="mini-stat mini-stat--done" title="Done">
+                <span>{{ project.task_counts.done }}</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+              </div>
+              <div class="mini-stat mini-stat--progress" title="In Progress">
+                <span>{{ project.task_counts.in_progress }}</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+              </div>
+              <div class="mini-stat mini-stat--todo" title="Todo">
+                <span>{{ project.task_counts.todo }}</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"></circle>
+                </svg>
+              </div>
             </div>
+
           </div>
         </div>
       </div>
