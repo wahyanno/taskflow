@@ -3,29 +3,28 @@ import { RouterModule, Routes } from '@angular/router';
 import { AuthGuard } from './core/guards/auth.guard';
 
 /**
- * App Routing Module - Mendefinisikan semua route aplikasi TaskFlow
+ * App Routing Module — defines all routes for the TaskFlow application.
  *
- * Struktur route:
- * /                     → redirect ke /dashboard
- * /auth/login           → Halaman login (public)
- * /auth/register        → Halaman register (public)
- * /dashboard            → Dashboard summary (protected - perlu login)
- * /projects             → List project (protected)
- * /projects/:id         → Detail project + task list (protected)
- * /projects/new         → Form buat project (protected)
- * /projects/:id/edit    → Form edit project (protected)
+ * Route structure:
+ * /                     → Landing page (public marketing page)
+ * /auth/login           → Login page (public)
+ * /auth/register        → Register page (public)
+ * /dashboard            → Dashboard summary (protected — requires login)
+ * /projects             → Project list (protected)
+ * /projects/:id         → Project detail + task list (protected)
  *
- * Lazy loading digunakan untuk optimasi bundle size.
+ * Lazy loading is used throughout to optimize the bundle size.
  */
 const routes: Routes = [
-  // Redirect root ke dashboard
+
+  // ==================== PUBLIC: Landing Page ====================
   {
     path: '',
-    redirectTo: 'dashboard',
-    pathMatch: 'full'
+    loadChildren: () =>
+      import('./features/landing/landing.module').then(m => m.LandingModule)
   },
 
-  // ==================== AUTH ROUTES (Public) ====================
+  // ==================== PUBLIC: Auth Routes ====================
   {
     path: 'auth',
     loadChildren: () =>
@@ -46,15 +45,15 @@ const routes: Routes = [
       import('./features/projects/projects.module').then(m => m.ProjectsModule)
   },
 
-  // Fallback: jika route tidak dikenal, redirect ke dashboard
+  // Fallback: unknown routes redirect to landing
   {
     path: '**',
-    redirectTo: 'dashboard'
+    redirectTo: ''
   }
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes)],
+  imports: [RouterModule.forRoot(routes, { scrollPositionRestoration: 'top' })],
   exports: [RouterModule]
 })
 export class AppRoutingModule { }

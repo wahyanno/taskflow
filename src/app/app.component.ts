@@ -66,10 +66,10 @@ export class AppComponent implements OnInit {
   }
 
   /**
-   * Check if the user is on an auth page (login / register).
-   * When true, the sidebar and navbar are hidden.
+   * Check if the user is on an auth page (login / register) or the landing page.
+   * When true, the sidebar and navbar are hidden — the page shows its own layout.
    */
   get isAuthPage(): boolean {
-    return this.router.url.startsWith('/auth');
+    return this.router.url.startsWith('/auth') || this.router.url === '/';
   }
 }

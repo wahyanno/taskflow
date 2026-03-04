@@ -1,0 +1,795 @@
+<!-- ==================== LANDING PAGE ==================== -->
+<div class="landing">
+
+    <!-- ================================================================
+       NAVBAR
+       ================================================================ -->
+    <nav class="land-nav" [class.land-nav--scrolled]="isScrolled">
+        <div class="land-nav__inner">
+            <div class="land-nav__logo" (click)="scrollTo('hero')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 11l3 3L22 4"></path>
+                    <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"></path>
+                </svg>
+                <span>TaskFlow</span>
+            </div>
+
+            <div class="land-nav__links">
+                <button (click)="scrollTo('features')" id="nav-features">Features</button>
+                <button (click)="scrollTo('preview')" id="nav-preview">Preview</button>
+                <button (click)="scrollTo('permissions')" id="nav-permissions">Roles</button>
+            </div>
+
+            <div class="land-nav__cta">
+                <!-- GitHub source links -->
+                <a href="https://github.com/wahyanno/taskflow" target="_blank" rel="noopener" class="btn-icon"
+                    id="nav-github" title="View source on GitHub">
+                    <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
+                        <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839
+                        9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343
+                        -3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608
+                        1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35
+                        -1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988
+                        1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75
+                        1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337
+                        1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7
+                        1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92
+                        .678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019
+                        10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
+                    </svg>
+                    GitHub
+                </a>
+                <button class="btn-ghost" (click)="goToLogin()" id="nav-login">Sign In</button>
+                <button class="btn-primary" (click)="goToRegister()" id="nav-register">Get Started</button>
+            </div>
+
+            <!-- Mobile hamburger -->
+            <button class="land-nav__hamburger" (click)="mobileNavOpen = !mobileNavOpen" id="nav-hamburger">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+
+        <!-- Mobile menu -->
+        <div class="land-nav__mobile" [class.open]="mobileNavOpen">
+            <button (click)="scrollTo('features')">Features</button>
+            <button (click)="scrollTo('preview')">Preview</button>
+            <button (click)="scrollTo('permissions')">Roles</button>
+            <button (click)="goToLogin()">Sign In</button>
+            <button class="btn-primary" (click)="goToRegister()">Get Started →</button>
+        </div>
+    </nav>
+
+    <!-- ================================================================
+       HERO
+       ================================================================ -->
+    <section class="land-hero" id="hero">
+        <div class="land-hero__bg">
+            <div class="land-hero__orb land-hero__orb--1"></div>
+            <div class="land-hero__orb land-hero__orb--2"></div>
+            <div class="land-hero__grid"></div>
+        </div>
+
+        <div class="land-container">
+            <div class="land-hero__content">
+                <div class="land-hero__badge">
+                    <span class="land-hero__badge-dot"></span>
+                    Open for freelance opportunities
+                </div>
+
+                <h1 class="land-hero__title">
+                    Enterprise Task Management<br>
+                    <span class="land-hero__title-gradient">Built for Teams</span>
+                </h1>
+
+                <p class="land-hero__desc">
+                    Manage projects, assign tasks, track progress and audit every change —
+                    all in one platform. Built with role-based permissions so every team
+                    member sees only what they need.
+                </p>
+
+                <div class="land-hero__actions">
+                    <button class="land-btn land-btn--primary" (click)="goToRegister()" id="hero-cta">
+                        Start for Free
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                            <polyline points="12 5 19 12 12 19"></polyline>
+                        </svg>
+                    </button>
+                    <button class="land-btn land-btn--ghost" (click)="goToLogin()" id="hero-login">
+                        Sign In →
+                    </button>
+                </div>
+
+                <div class="land-hero__demo">
+                    Demo:
+                    <code>admin&#64;taskflow.dev</code> /
+                    <code>manager&#64;taskflow.dev</code> /
+                    <code>member&#64;taskflow.dev</code>
+                    &nbsp;— password: <code>password123</code>
+                </div>
+
+                <!-- Stats row -->
+                <div class="land-hero__stats">
+                    <div class="land-stat">
+                        <span class="land-stat__num">3</span>
+                        <span class="land-stat__label">Role levels</span>
+                    </div>
+                    <div class="land-stat__div"></div>
+                    <div class="land-stat">
+                        <span class="land-stat__num">JWT</span>
+                        <span class="land-stat__label">Stateless auth</span>
+                    </div>
+                    <div class="land-stat__div"></div>
+                    <div class="land-stat">
+                        <span class="land-stat__num">REST</span>
+                        <span class="land-stat__label">API backend</span>
+                    </div>
+                    <div class="land-stat__div"></div>
+                    <div class="land-stat">
+                        <span class="land-stat__num">100%</span>
+                        <span class="land-stat__label">Audit logged</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hero mockup -->
+            <div class="land-hero__mockup">
+                <div class="mockup-window">
+                    <div class="mockup-window__bar">
+                        <span class="dot dot--red"></span>
+                        <span class="dot dot--yellow"></span>
+                        <span class="dot dot--green"></span>
+                        <span class="mockup-window__url">taskflow.pages.dev/dashboard</span>
+                    </div>
+                    <div class="mockup-dashboard">
+                        <!-- Sidebar -->
+                        <div class="mockup-sidebar">
+                            <div class="mockup-sidebar__logo">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14"
+                                    height="14">
+                                    <path d="M9 11l3 3L22 4"></path>
+                                    <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"></path>
+                                </svg>
+                                TaskFlow
+                            </div>
+                            <div class="mockup-nav-item mockup-nav-item--active">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12"
+                                    height="12">
+                                    <rect x="3" y="3" width="7" height="7"></rect>
+                                    <rect x="14" y="3" width="7" height="7"></rect>
+                                    <rect x="3" y="14" width="7" height="7"></rect>
+                                    <rect x="14" y="14" width="7" height="7"></rect>
+                                </svg>
+                                Dashboard
+                            </div>
+                            <div class="mockup-nav-item">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12"
+                                    height="12">
+                                    <path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z">
+                                    </path>
+                                </svg>
+                                Projects
+                            </div>
+                            <div class="mockup-nav-item">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12"
+                                    height="12">
+                                    <path d="M9 11l3 3L22 4"></path>
+                                </svg>
+                                My Tasks
+                            </div>
+                        </div>
+                        <!-- Main content -->
+                        <div class="mockup-main">
+                            <div class="mockup-header">
+                                <span class="mockup-greeting">Good morning, Admin 👋</span>
+                                <div class="mockup-avatar">A</div>
+                            </div>
+                            <!-- KPI cards -->
+                            <div class="mockup-kpis">
+                                <div class="mockup-kpi mockup-kpi--indigo">
+                                    <span class="mockup-kpi__num">12</span>
+                                    <span class="mockup-kpi__label">Projects</span>
+                                </div>
+                                <div class="mockup-kpi mockup-kpi--emerald">
+                                    <span class="mockup-kpi__num">84</span>
+                                    <span class="mockup-kpi__label">Tasks Done</span>
+                                </div>
+                                <div class="mockup-kpi mockup-kpi--amber">
+                                    <span class="mockup-kpi__num">5</span>
+                                    <span class="mockup-kpi__label">Overdue</span>
+                                </div>
+                            </div>
+                            <!-- Project list mockup -->
+                            <div class="mockup-projects">
+                                <div class="mockup-project-row">
+                                    <span class="mockup-badge mockup-badge--active">active</span>
+                                    <span class="mockup-project-name">Portfolio Website</span>
+                                    <div class="mockup-progress">
+                                        <div class="mockup-progress__bar" style="width:72%"></div>
+                                    </div>
+                                    <span class="mockup-pct">72%</span>
+                                </div>
+                                <div class="mockup-project-row">
+                                    <span class="mockup-badge mockup-badge--active">active</span>
+                                    <span class="mockup-project-name">API Refactor</span>
+                                    <div class="mockup-progress">
+                                        <div class="mockup-progress__bar" style="width:45%"></div>
+                                    </div>
+                                    <span class="mockup-pct">45%</span>
+                                </div>
+                                <div class="mockup-project-row">
+                                    <span class="mockup-badge mockup-badge--done">done</span>
+                                    <span class="mockup-project-name">Auth Module</span>
+                                    <div class="mockup-progress">
+                                        <div class="mockup-progress__bar mockup-progress__bar--done" style="width:100%">
+                                        </div>
+                                    </div>
+                                    <span class="mockup-pct">100%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ================================================================
+       FEATURES
+       ================================================================ -->
+    <section class="land-features" id="features">
+        <div class="land-container">
+            <div class="land-section-head">
+                <span class="land-section-tag">Core Features</span>
+                <h2>Everything your team needs</h2>
+                <p>Built with real-world requirements in mind — the kind of features clients expect in production.</p>
+            </div>
+
+            <div class="land-features__grid">
+
+                <div class="land-feature-card">
+                    <div class="land-feature-card__icon land-feature-card__icon--indigo">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="3" width="7" height="7"></rect>
+                            <rect x="3" y="14" width="7" height="7"></rect>
+                            <rect x="14" y="14" width="7" height="7"></rect>
+                        </svg>
+                    </div>
+                    <h3>Kanban Board</h3>
+                    <p>Drag & drop tasks across fully customizable status columns. Each project defines its own
+                        workflow.</p>
+                    <ul class="land-feature-card__list">
+                        <li>Custom status columns per project</li>
+                        <li>Drag-drop reorder of columns</li>
+                        <li>Instant optimistic UI updates</li>
+                    </ul>
+                </div>
+
+                <div class="land-feature-card">
+                    <div class="land-feature-card__icon land-feature-card__icon--emerald">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                        </svg>
+                    </div>
+                    <h3>Role-Based Access Control</h3>
+                    <p>Granular permissions enforced on both frontend and backend. Three role levels with distinct
+                        capabilities.</p>
+                    <ul class="land-feature-card__list">
+                        <li>Admin · Manager · Member</li>
+                        <li>JWT stateless authentication</li>
+                        <li>Frontend UI adapts per role</li>
+                    </ul>
+                </div>
+
+                <div class="land-feature-card">
+                    <div class="land-feature-card__icon land-feature-card__icon--amber">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                        </svg>
+                    </div>
+                    <h3>Smart Dashboard</h3>
+                    <p>Role-aware statistics surface the data each user actually needs — not a one-size-fits-all view.
+                    </p>
+                    <ul class="land-feature-card__list">
+                        <li>Completion percentages</li>
+                        <li>Overdue task detection</li>
+                        <li>Recent project activity</li>
+                    </ul>
+                </div>
+
+                <div class="land-feature-card">
+                    <div class="land-feature-card__icon land-feature-card__icon--rose">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                        </svg>
+                    </div>
+                    <h3>Full Audit Trail</h3>
+                    <p>Every project and task change is recorded — who changed what, when, and the before/after values.
+                    </p>
+                    <ul class="land-feature-card__list">
+                        <li>Project activity log</li>
+                        <li>Task status change history</li>
+                        <li>Reassignment tracking</li>
+                    </ul>
+                </div>
+
+                <div class="land-feature-card">
+                    <div class="land-feature-card__icon land-feature-card__icon--purple">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                    </div>
+                    <h3>Overdue Detection</h3>
+                    <p>Business logic computed server-side: tasks past their due date that aren't done are flagged
+                        automatically.</p>
+                    <ul class="land-feature-card__list">
+                        <li>Server-side business rule</li>
+                        <li>Visual overdue indicators</li>
+                        <li>Filtered in dashboard stats</li>
+                    </ul>
+                </div>
+
+                <div class="land-feature-card">
+                    <div class="land-feature-card__icon land-feature-card__icon--sky">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
+                            <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path>
+                            <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
+                        </svg>
+                    </div>
+                    <h3>Soft Delete</h3>
+                    <p>Nothing is permanently erased. Projects and tasks are soft-deleted with a timestamp, preserving
+                        data integrity.</p>
+                    <ul class="land-feature-card__list">
+                        <li>is_deleted + deleted_at columns</li>
+                        <li>Recoverable data model</li>
+                        <li>Audit-safe architecture</li>
+                    </ul>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- ================================================================
+       APP PREVIEW (CSS Mockups)
+       ================================================================ -->
+    <section class="land-preview" id="preview">
+        <div class="land-container">
+            <div class="land-section-head">
+                <span class="land-section-tag">App Preview</span>
+                <h2>See it in action</h2>
+                <p>A clean, dark-themed interface built with a custom CSS design system. No UI framework dependencies.
+                </p>
+            </div>
+
+            <!-- Preview tabs -->
+            <div class="land-preview__tabs" id="preview-tabs">
+                <button class="land-tab active" id="tab-kanban" (click)="setTab('kanban', $event)">Kanban Board</button>
+                <button class="land-tab" id="tab-tasks" (click)="setTab('tasks', $event)">Task List</button>
+                <button class="land-tab" id="tab-dash" (click)="setTab('dash', $event)">Dashboard</button>
+            </div>
+
+            <!-- Kanban mockup -->
+            <div class="land-preview__screen" id="screen-kanban">
+                <div class="mockup-window mockup-window--wide">
+                    <div class="mockup-window__bar">
+                        <span class="dot dot--red"></span>
+                        <span class="dot dot--yellow"></span>
+                        <span class="dot dot--green"></span>
+                        <span class="mockup-window__url">taskflow.pages.dev/projects/1 · Kanban</span>
+                    </div>
+                    <div class="mockup-kanban">
+                        <!-- Todo column -->
+                        <div class="mk-col">
+                            <div class="mk-col__head mk-col__head--gray">
+                                <span class="mk-dot mk-dot--gray"></span> To Do
+                                <span class="mk-count">3</span>
+                            </div>
+                            <div class="mk-card">
+                                <div class="mk-card__top"><span class="mk-prio mk-prio--high">high</span></div>
+                                <div class="mk-card__title">Setup CI/CD Pipeline</div>
+                                <div class="mk-card__meta">🗓 Mar 10 · <span>@admin</span></div>
+                            </div>
+                            <div class="mk-card">
+                                <div class="mk-card__top"><span class="mk-prio mk-prio--medium">medium</span></div>
+                                <div class="mk-card__title">Write API documentation</div>
+                                <div class="mk-card__meta">🗓 Mar 15 · <span>@manager</span></div>
+                            </div>
+                            <div class="mk-card">
+                                <div class="mk-card__top"><span class="mk-prio mk-prio--low">low</span></div>
+                                <div class="mk-card__title">Update README</div>
+                                <div class="mk-card__meta">No due date</div>
+                            </div>
+                        </div>
+                        <!-- In Progress column -->
+                        <div class="mk-col">
+                            <div class="mk-col__head mk-col__head--blue">
+                                <span class="mk-dot mk-dot--blue"></span> In Progress
+                                <span class="mk-count">2</span>
+                            </div>
+                            <div class="mk-card mk-card--dragging">
+                                <div class="mk-card__top"><span class="mk-prio mk-prio--high">high</span></div>
+                                <div class="mk-card__title">Build Angular frontend</div>
+                                <div class="mk-card__meta">🗓 Mar 8 · <span>@member</span></div>
+                            </div>
+                            <div class="mk-card">
+                                <div class="mk-card__top"><span class="mk-prio mk-prio--medium">medium</span></div>
+                                <div class="mk-card__title">Implement JWT auth</div>
+                                <div class="mk-card__meta">🗓 Mar 5 · <span class="mk-overdue">Overdue ⚠</span></div>
+                            </div>
+                        </div>
+                        <!-- Review column -->
+                        <div class="mk-col">
+                            <div class="mk-col__head mk-col__head--purple">
+                                <span class="mk-dot mk-dot--purple"></span> Review
+                                <span class="mk-count">1</span>
+                            </div>
+                            <div class="mk-card">
+                                <div class="mk-card__top"><span class="mk-prio mk-prio--high">high</span></div>
+                                <div class="mk-card__title">Database schema design</div>
+                                <div class="mk-card__meta">🗓 Mar 3 · <span>@manager</span></div>
+                            </div>
+                            <div class="mk-col__placeholder">Drop tasks here</div>
+                        </div>
+                        <!-- Done column -->
+                        <div class="mk-col">
+                            <div class="mk-col__head mk-col__head--green">
+                                <span class="mk-dot mk-dot--green"></span> Done
+                                <span class="mk-count">4</span>
+                            </div>
+                            <div class="mk-card mk-card--done">
+                                <div class="mk-card__top"><span class="mk-prio mk-prio--high">high</span></div>
+                                <div class="mk-card__title">Setup backend API</div>
+                                <div class="mk-card__meta">✅ Completed</div>
+                            </div>
+                            <div class="mk-card mk-card--done">
+                                <div class="mk-card__top"><span class="mk-prio mk-prio--medium">medium</span></div>
+                                <div class="mk-card__title">Deploy to Fly.io</div>
+                                <div class="mk-card__meta">✅ Completed</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Task list mockup (hidden by default) -->
+            <div class="land-preview__screen hidden" id="screen-tasks">
+                <div class="mockup-window mockup-window--wide">
+                    <div class="mockup-window__bar">
+                        <span class="dot dot--red"></span><span class="dot dot--yellow"></span><span
+                            class="dot dot--green"></span>
+                        <span class="mockup-window__url">taskflow.pages.dev/projects/1 · Table</span>
+                    </div>
+                    <div class="mockup-table-wrap">
+                        <table class="mockup-table">
+                            <thead>
+                                <tr>
+                                    <th>Task</th>
+                                    <th>Priority</th>
+                                    <th>Assignee</th>
+                                    <th>Due Date</th>
+                                    <th>Status</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Setup CI/CD Pipeline</strong></td>
+                                    <td><span class="mk-prio mk-prio--high">high</span></td>
+                                    <td>admin</td>
+                                    <td>Mar 10</td>
+                                    <td><span class="mk-status mk-status--todo">todo</span></td>
+                                    <td><span class="mk-action">⋮</span></td>
+                                </tr>
+                                <tr class="mk-row--overdue">
+                                    <td><strong>Implement JWT auth</strong> <span class="mk-overdue-tag">⚠
+                                            Overdue</span></td>
+                                    <td><span class="mk-prio mk-prio--high">high</span></td>
+                                    <td>member</td>
+                                    <td class="mk-past">Mar 5</td>
+                                    <td><span class="mk-status mk-status--progress">in progress</span></td>
+                                    <td><span class="mk-action">⋮</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Build Angular frontend</strong></td>
+                                    <td><span class="mk-prio mk-prio--medium">medium</span></td>
+                                    <td>member</td>
+                                    <td>Mar 8</td>
+                                    <td><span class="mk-status mk-status--progress">in progress</span></td>
+                                    <td><span class="mk-action">⋮</span></td>
+                                </tr>
+                                <tr class="mk-row--done">
+                                    <td><strong>Database schema design</strong></td>
+                                    <td><span class="mk-prio mk-prio--high">high</span></td>
+                                    <td>manager</td>
+                                    <td>Mar 3</td>
+                                    <td><span class="mk-status mk-status--done">done</span></td>
+                                    <td><span class="mk-action">⋮</span></td>
+                                </tr>
+                                <tr class="mk-row--done">
+                                    <td><strong>Setup backend API</strong></td>
+                                    <td><span class="mk-prio mk-prio--high">high</span></td>
+                                    <td>admin</td>
+                                    <td>Feb 28</td>
+                                    <td><span class="mk-status mk-status--done">done</span></td>
+                                    <td><span class="mk-action">⋮</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dashboard mockup (hidden by default) -->
+            <div class="land-preview__screen hidden" id="screen-dash">
+                <div class="mockup-window mockup-window--wide">
+                    <div class="mockup-window__bar">
+                        <span class="dot dot--red"></span><span class="dot dot--yellow"></span><span
+                            class="dot dot--green"></span>
+                        <span class="mockup-window__url">taskflow.pages.dev/dashboard</span>
+                    </div>
+                    <div class="mockup-dash-full">
+                        <div class="mockup-dash-header">
+                            <h3>Good morning, Manager 👋</h3>
+                            <span class="mockup-dash-date">Wed, Mar 4 2026</span>
+                        </div>
+                        <div class="mockup-dash-kpis">
+                            <div class="mockup-kpi-lg mockup-kpi-lg--indigo">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20"
+                                    height="20">
+                                    <path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z">
+                                    </path>
+                                </svg>
+                                <span class="mockup-kpi-lg__num">8</span>
+                                <span class="mockup-kpi-lg__label">Active Projects</span>
+                            </div>
+                            <div class="mockup-kpi-lg mockup-kpi-lg--emerald">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20"
+                                    height="20">
+                                    <path d="M9 11l3 3L22 4"></path>
+                                </svg>
+                                <span class="mockup-kpi-lg__num">63%</span>
+                                <span class="mockup-kpi-lg__label">Completion Rate</span>
+                            </div>
+                            <div class="mockup-kpi-lg mockup-kpi-lg--amber">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20"
+                                    height="20">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <polyline points="12 6 12 12 16 14"></polyline>
+                                </svg>
+                                <span class="mockup-kpi-lg__num">5</span>
+                                <span class="mockup-kpi-lg__label">Overdue Tasks</span>
+                            </div>
+                            <div class="mockup-kpi-lg mockup-kpi-lg--rose">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20"
+                                    height="20">
+                                    <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"></path>
+                                    <circle cx="9" cy="7" r="4"></circle>
+                                </svg>
+                                <span class="mockup-kpi-lg__num">6</span>
+                                <span class="mockup-kpi-lg__label">Team Members</span>
+                            </div>
+                        </div>
+                        <div class="mockup-dash-status">
+                            <div class="mockup-status-bar">
+                                <div class="mockup-status-bar__label">
+                                    <span>To Do</span><span class="mockup-status-bar__ct">12</span>
+                                </div>
+                                <div class="mockup-status-bar__track">
+                                    <div class="mockup-status-bar__fill mockup-status-bar__fill--gray"
+                                        style="width:30%"></div>
+                                </div>
+                            </div>
+                            <div class="mockup-status-bar">
+                                <div class="mockup-status-bar__label">
+                                    <span>In Progress</span><span class="mockup-status-bar__ct">18</span>
+                                </div>
+                                <div class="mockup-status-bar__track">
+                                    <div class="mockup-status-bar__fill mockup-status-bar__fill--blue"
+                                        style="width:45%"></div>
+                                </div>
+                            </div>
+                            <div class="mockup-status-bar">
+                                <div class="mockup-status-bar__label">
+                                    <span>Done</span><span class="mockup-status-bar__ct">25</span>
+                                </div>
+                                <div class="mockup-status-bar__track">
+                                    <div class="mockup-status-bar__fill mockup-status-bar__fill--green"
+                                        style="width:63%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ================================================================
+       PERMISSION MATRIX
+       ================================================================ -->
+    <section class="land-perms" id="permissions">
+        <div class="land-container">
+            <div class="land-section-head">
+                <span class="land-section-tag">Access Control</span>
+                <h2>Role-Based Permission Matrix</h2>
+                <p>Every action is protected server-side. The frontend simply reflects what each role is allowed to do.
+                </p>
+            </div>
+
+            <div class="land-perms__table-wrap">
+                <table class="land-perms__table" role="table" aria-label="Role permissions matrix">
+                    <thead>
+                        <tr>
+                            <th>Action</th>
+                            <th><span class="role-pill role-pill--admin">Admin</span></th>
+                            <th><span class="role-pill role-pill--manager">Manager</span></th>
+                            <th><span class="role-pill role-pill--member">Member</span></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Create Project</td>
+                            <td><span class="perm perm--yes">✔</span></td>
+                            <td><span class="perm perm--yes">✔</span></td>
+                            <td><span class="perm perm--no">✖</span></td>
+                        </tr>
+                        <tr>
+                            <td>Update Project</td>
+                            <td><span class="perm perm--yes">✔</span></td>
+                            <td><span class="perm perm--partial">Own only</span></td>
+                            <td><span class="perm perm--no">✖</span></td>
+                        </tr>
+                        <tr>
+                            <td>Delete Project</td>
+                            <td><span class="perm perm--yes">✔</span></td>
+                            <td><span class="perm perm--no">✖</span></td>
+                            <td><span class="perm perm--no">✖</span></td>
+                        </tr>
+                        <tr>
+                            <td>Manage Members</td>
+                            <td><span class="perm perm--yes">✔</span></td>
+                            <td><span class="perm perm--yes">✔</span></td>
+                            <td><span class="perm perm--no">✖</span></td>
+                        </tr>
+                        <tr>
+                            <td>Create Task</td>
+                            <td><span class="perm perm--yes">✔</span></td>
+                            <td><span class="perm perm--yes">✔</span></td>
+                            <td><span class="perm perm--yes">✔</span></td>
+                        </tr>
+                        <tr>
+                            <td>Assign Task</td>
+                            <td><span class="perm perm--yes">✔</span></td>
+                            <td><span class="perm perm--yes">✔</span></td>
+                            <td><span class="perm perm--no">✖</span></td>
+                        </tr>
+                        <tr>
+                            <td>Change Task Status</td>
+                            <td><span class="perm perm--yes">✔</span></td>
+                            <td><span class="perm perm--yes">✔</span></td>
+                            <td><span class="perm perm--partial">Assigned</span></td>
+                        </tr>
+                        <tr>
+                            <td>Delete Task</td>
+                            <td><span class="perm perm--yes">✔</span></td>
+                            <td><span class="perm perm--partial">Own tasks</span></td>
+                            <td><span class="perm perm--no">✖</span></td>
+                        </tr>
+                        <tr>
+                            <td>Manage Statuses</td>
+                            <td><span class="perm perm--yes">✔</span></td>
+                            <td><span class="perm perm--yes">✔</span></td>
+                            <td><span class="perm perm--no">✖</span></td>
+                        </tr>
+                        <tr>
+                            <td>View Activity Logs</td>
+                            <td><span class="perm perm--yes">✔</span></td>
+                            <td><span class="perm perm--yes">✔</span></td>
+                            <td><span class="perm perm--partial">Member</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <p class="land-perms__note">
+                <span class="perm perm--partial">Partial</span> = restricted to tasks or projects the user created or is
+                assigned to
+            </p>
+        </div>
+    </section>
+
+    <!-- ================================================================
+       CTA
+       ================================================================ -->
+    <section class="land-cta" id="cta">
+        <div class="land-cta__bg">
+            <div class="land-cta__orb land-cta__orb--1"></div>
+            <div class="land-cta__orb land-cta__orb--2"></div>
+        </div>
+        <div class="land-container land-cta__inner">
+            <h2>Ready to try TaskFlow?</h2>
+            <p>Jump in with a demo account — no setup needed.</p>
+            <div class="land-cta__actions">
+                <button class="land-btn land-btn--primary land-btn--lg" (click)="goToRegister()" id="cta-register">
+                    Create Account
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                        <polyline points="12 5 19 12 12 19"></polyline>
+                    </svg>
+                </button>
+                <button class="land-btn land-btn--outline land-btn--lg" (click)="goToLogin()" id="cta-login">
+                    Sign In with Demo Account
+                </button>
+            </div>
+
+            <div class="land-cta__tech">
+                <span>Built with</span>
+                <div class="land-tech-pills">
+                    <span class="land-tech-pill">Angular 15</span>
+                    <span class="land-tech-pill">Yii2 PHP</span>
+                    <span class="land-tech-pill">PostgreSQL</span>
+                    <span class="land-tech-pill">Supabase</span>
+                    <span class="land-tech-pill">JWT</span>
+                    <span class="land-tech-pill">Fly.io</span>
+                </div>
+                <!-- Source code links -->
+                <div class="land-cta__source">
+                    <a href="https://github.com/wahyanno/api-taskflow" target="_blank" rel="noopener"
+                        class="land-source-link" id="cta-github-api">
+                        <svg viewBox="0 0 24 24" fill="currentColor" width="13" height="13">
+                            <path
+                                d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
+                        </svg>
+                        api-taskflow (Yii2)
+                    </a>
+                    <span class="land-source-sep">·</span>
+                    <a href="https://github.com/wahyanno/taskflow" target="_blank" rel="noopener"
+                        class="land-source-link" id="cta-github-frontend">
+                        <svg viewBox="0 0 24 24" fill="currentColor" width="13" height="13">
+                            <path
+                                d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
+                        </svg>
+                        taskflow (Angular)
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ================================================================
+       FOOTER
+       ================================================================ -->
+    <footer class="land-footer">
+        <div class="land-container land-footer__inner">
+            <div class="land-footer__brand">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 11l3 3L22 4"></path>
+                    <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"></path>
+                </svg>
+                <span>TaskFlow</span>
+            </div>
+
+            <div class="land-footer__links">
+                <button (click)="scrollTo('features')">Features</button>
+                <button (click)="scrollTo('preview')">Preview</button>
+                <button (click)="scrollTo('permissions')">Permissions</button>
+                <a href="https://github.com/wahyanno/api-taskflow" target="_blank" rel="noopener">API Source</a>
+                <a href="https://github.com/wahyanno/taskflow" target="_blank" rel="noopener">Frontend Source</a>
+            </div>
+
+            <div class="land-footer__copy">
+                <span>© 2026 TaskFlow · Portfolio project by</span>
+                <a href="https://github.com/wahyanno" target="_blank" rel="noopener">@wahyanno</a>
+                &nbsp;·&nbsp;Open for freelance opportunities
+            </div>
+        </div>
+    </footer>
+
+</div>
