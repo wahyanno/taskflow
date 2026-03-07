@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskFlow - System Architecture</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'base',
+            themeVariables: {
+                primaryColor: '#f8fafc',
+                primaryTextColor: '#1e293b',
+                primaryBorderColor: '#cbd5e1',
+                lineColor: '#64748b',
+                fontFamily: 'Inter, sans-serif'
+            }
+        });
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f1f5f9;
+            color: #0f172a;
+        }
+
+        .mermaid {
+            display: flex;
+            justify-content: center;
+            margin: 2rem 0;
+            padding: 1rem;
+            overflow-x: auto;
+        }
+
+        @media print {
+            body {
+                background-color: white;
+            }
+
+            .no-print {
+                display: none;
+            }
+
+            section {
+                box-shadow: none !important;
+                border: 1px solid #e2e8f0;
+                break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+
+<body class="p-4 md:p-8 max-w-5xl mx-auto pb-20">
+    <!-- Tombol cetak PDF -->
+    <div class="flex justify-end mb-4 no-print">
+        <button onclick="window.print()"
+            class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-sm">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                <rect x="6" y="14" width="12" height="8"></rect>
+            </svg>
+            Save as PDF
+        </button>
+    </div>
+
+    <header class="mb-12 text-center">
+        <h1 class="text-3xl md:text-4xl font-extrabold text-slate-800 mb-4 tracking-tight">TaskFlow <span
+                class="text-blue-600">Architecture</span></h1>
+        <p class="text-lg text-slate-500 max-w-2xl mx-auto">High-level system topology and database entity-relationship
+            blueprint for the TaskFlow application.</p>
+    </header>
+
+    <section class="bg-white p-6 md:p-10 rounded-2xl shadow-sm border border-slate-200 mb-10">
+        <h2 class="text-2xl font-bold border-b border-slate-100 pb-4 mb-6 text-slate-800 flex items-center gap-3">
+            <span
+                class="bg-blue-100 text-blue-600 w-8 h-8 rounded-full flex items-center justify-center text-sm">1</span>
+            System Topology
+        </h2>
+
+        <div class="mermaid">
+            graph TD
+            subgraph Frontend [Client Layer]
+            A[Angular 15 SPA \n Browser]
+            end
+
+            subgraph Backend [API Layer]
+            B[Yii2 REST API \n PHP 7.4 / 8.x]
+            end
+
+            subgraph Database [Data Layer]
+            C[(MySQL / PostgreSQL)]
+            end
+
+            A -->|HTTP POST JSON\n+ JWT Bearer Token| B
+            B -->|JSON Response| A
+            B -->|PDO / SQL Queries| C
+            C -->|Result Set| B
+
+            style A fill:#dd0031,stroke:#c3002f,stroke-width:2px,color:#fff
+            style B fill:#4f46e5,stroke:#4338ca,stroke-width:2px,color:#fff
+            style C fill:#0ea5e9,stroke:#0284c7,stroke-width:2px,color:#fff
+            style Frontend fill:#f8fafc,stroke:#e2e8f0,stroke-dasharray: 5 5
+            style Backend fill:#f8fafc,stroke:#e2e8f0,stroke-dasharray: 5 5
+            style Database fill:#f8fafc,stroke:#e2e8f0,stroke-dasharray: 5 5
+        </div>
+
+        <p class="text-slate-600 mt-6 leading-relaxed bg-slate-50 p-4 rounded-xl text-sm border border-slate-100">
+            TaskFlow is built on a decoupled architecture. The frontend is a modern Angular Single Page Application
+            (SPA) that communicates with the backend exclusively via RESTful JSON endpoints.
+            Authentication is completely stateless, passing an encrypted JSON Web Token (JWT) in every HTTP header.
+        </p>
+    </section>
+
+    <section class="bg-white p-6 md:p-10 rounded-2xl shadow-sm border border-slate-200">
+        <h2 class="text-2xl font-bold border-b border-slate-100 pb-4 mb-6 text-slate-800 flex items-center gap-3">
+            <span
+                class="bg-blue-100 text-blue-600 w-8 h-8 rounded-full flex items-center justify-center text-sm">2</span>
+            Entity Relationship Diagram
+        </h2>
+
+        <div class="mermaid">
+            erDiagram
+            USERS ||--o{ USER_ROLES : has
+            ROLES ||--o{ USER_ROLES : assigned_to
+            USERS ||--o{ PROJECTS : creates
+            USERS ||--o{ PROJECT_MEMBERS : "is member of"
+            PROJECTS ||--o{ PROJECT_MEMBERS : includes
+            PROJECTS ||--o{ PROJECT_STATUSES : defines
+            PROJECTS ||--o{ TASKS : contains
+            PROJECTS ||--o{ PROJECT_ACTIVITY_LOGS : generates
+            USERS ||--o{ TASKS : "is assigned to / created by"
+            TASKS ||--o{ TASK_ACTIVITY_LOGS : generates
+
+            USERS {
+            int id PK
+            string name
+            string email
+            string password_hash
+            }
+            ROLES {
+            int id PK
+            string name
+            }
+            PROJECTS {
+            int id PK
+            string name
+            string status
+            date deadline
+            boolean is_deleted
+            }
+            PROJECT_STATUSES {
+            int id PK
+            int project_id FK
+            string name
+            string slug
+            string color
+            int sort_order
+            }
+            TASKS {
+            int id PK
+            int project_id FK
+            string title
+            string priority
+            string status
+            date due_date
+            int assigned_to FK
+            boolean is_deleted
+            }
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-6 mt-6">
+            <div class="text-slate-600 leading-relaxed bg-slate-50 p-4 rounded-xl text-sm border border-slate-100">
+                <h3 class="font-bold text-slate-800 mb-2">Soft Delete Mechanism</h3>
+                Important records like <code>projects</code> and <code>tasks</code> use soft deletes
+                (<code>is_deleted</code>) rather than being permanently removed. This prevents data fragmentation and
+                preserves the integrity of the audit trails.
+            </div>
+
+            <div class="text-slate-600 leading-relaxed bg-slate-50 p-4 rounded-xl text-sm border border-slate-100">
+                <h3 class="font-bold text-slate-800 mb-2">Dynamic Kanban Columns</h3>
+                Unlike traditional systems with hardcoded statuses, each project has its own rows in
+                <code>project_statuses</code>. Tasks join with these custom statuses via the unique <code>slug</code>
+                identifier.
+            </div>
+        </div>
+    </section>
+</body>
+
+</html>
