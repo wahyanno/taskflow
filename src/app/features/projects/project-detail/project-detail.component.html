@@ -129,7 +129,7 @@
           <td class="text-sm text-muted">{{ task.due_date ? (task.due_date | date:'dd MMM') : '—' }}</td>
           <td>
             <!-- Dropdown status menggunan custom statuses project -->
-            <select id="select-status-{{task.id}}" [value]="task.status"
+            <select id="select-status-{{task.id}}" [ngModel]="task.status"
               (change)="onStatusChange(task, $any($event.target).value)"
               class="status-select status-select--{{ task.status }}">
               <option *ngFor="let s of projectStatuses" [value]="s.slug">{{ s.name }}</option>
@@ -201,7 +201,7 @@
           </div>
 
           <!-- Status dropdown using projectStatuses -->
-          <select class="status-select status-select--{{ task.status }} kanban-card__status" [value]="task.status"
+          <select class="status-select status-select--{{ task.status }} kanban-card__status" [ngModel]="task.status"
             (change)="onStatusChange(task, $any($event.target).value)">
             <option *ngFor="let s of projectStatuses" [value]="s.slug">{{ s.name }}</option>
           </select>
