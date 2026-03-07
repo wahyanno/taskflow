@@ -84,7 +84,79 @@
       background: rgba(99, 102, 241, 0.15);
       color: var(--color-primary-light);
 
-      svg { color: var(--color-primary); }
+      svg {
+        color: var(--color-primary);
+      }
+    }
+  }
+
+  /* System Info Widget (Auto-Reset) */
+  &__info {
+    margin: 0 var(--spacing-md) var(--spacing-md);
+    padding: 12px;
+    background: rgba(59, 130, 246, 0.08);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    border-radius: var(--border-radius-sm);
+  }
+
+  &__info-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--color-primary-light);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+
+    svg {
+      width: 14px;
+      height: 14px;
+    }
+  }
+
+  &__info-text {
+    font-size: 11px;
+    color: var(--color-text-muted);
+    line-height: 1.5;
+    margin-bottom: 10px;
+
+    strong {
+      color: var(--color-text);
+    }
+  }
+
+  &__info-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+    padding: 6px;
+    background: var(--color-bg-secondary);
+    border: 1px dashed var(--color-border);
+    border-radius: 4px;
+    color: var(--color-text);
+    font-size: 11px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s;
+
+    svg {
+      width: 14px;
+      height: 14px;
+      color: var(--color-primary);
+    }
+
+    &:hover {
+      background: var(--color-primary);
+      border-color: var(--color-primary);
+      color: #fff;
+
+      svg {
+        color: #fff;
+      }
     }
   }
 
@@ -138,10 +210,13 @@
     transition: all 0.15s;
     flex-shrink: 0;
 
-    svg { width: 18px; height: 18px; }
+    svg {
+      width: 18px;
+      height: 18px;
+    }
 
     &:hover {
-      background: rgba(239,68,68,0.1);
+      background: rgba(239, 68, 68, 0.1);
       color: var(--color-danger);
     }
   }
@@ -150,7 +225,9 @@
   @media (max-width: 768px) {
     transform: translateX(-100%);
 
-    &--open { transform: translateX(0); }
+    &--open {
+      transform: translateX(0);
+    }
   }
 
   &__overlay {
@@ -160,7 +237,7 @@
       display: block;
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,0.5);
+      background: rgba(0, 0, 0, 0.5);
       z-index: 99;
     }
   }
@@ -204,9 +281,14 @@
     display: flex;
     border-radius: var(--border-radius-sm);
 
-    svg { width: 24px; height: 24px; }
+    svg {
+      width: 24px;
+      height: 24px;
+    }
 
-    &:hover { background: var(--color-bg-tertiary); }
+    &:hover {
+      background: var(--color-bg-tertiary);
+    }
   }
 
   &__title {
